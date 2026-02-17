@@ -10,8 +10,6 @@
 #define SIN_PIN    GPIO_PIN_3 //SIN PIN - PA3
 #define SIN_PORT   GPIOA
 
-hal_status_t Sensor_Init(ADC_HandleTypeDef* hadc);
-
 // Function definitions
 double Read_Sensor(ADC_HandleTypeDef* hadc);
 

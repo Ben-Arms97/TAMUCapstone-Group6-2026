@@ -91,7 +91,7 @@ int main(void)
   MX_GPIO_Init();
   MX_ADC_Init();
   /* USER CODE BEGIN 2 */
-  Sensor_Init(&hadc);
+  hal_status_t status = HAL_ADC_Start(hadc);
 
   /* USER CODE END 2 */
 
