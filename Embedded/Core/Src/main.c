@@ -100,7 +100,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-    // TODO: Write control flow
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -176,7 +176,7 @@ static void MX_ADC_Init(void)
   hadc.Init.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
   hadc.Init.ScanConvMode = ADC_SCAN_DIRECTION_FORWARD;
   hadc.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc.Init.ContinuousConvMode = ENABLE;
+  hadc.Init.ContinuousConvMode = DISABLE;
   hadc.Init.DiscontinuousConvMode = DISABLE;
   hadc.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   hadc.Init.ExternalTrigConv = ADC_SOFTWARE_START;
