@@ -1,0 +1,69 @@
+# --------------------
+# Python
+# --------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.sqlite3
+
+# Virtual environments
+venv/
+.venv/
+
+# --------------------
+# Node / Frontend
+# --------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+dist/
+build/
+
+# --------------------
+# Environment / Secrets
+# --------------------
+.env
+.env.*
+
+# --------------------
+# Git
+# --------------------
+.git/
+.gitignore
+
+# --------------------
+# OS / Editor junk
+# --------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --------------------
+# Docker artifacts
+# --------------------
+Dockerfile*
+docker-compose*.yml
+
+# --------------------
+# Docs / Media
+# --------------------
+*.pdf
+*.md
+
+# --------------------
+# Tests / Dev only
+# --------------------
+tests/
+coverage/
+
+# --------------------
+# Caches
+# --------------------
+.cache/
+.mypy_cache/
+.pytest_cache/
