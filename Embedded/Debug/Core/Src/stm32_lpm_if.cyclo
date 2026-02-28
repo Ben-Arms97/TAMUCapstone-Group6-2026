@@ -1,0 +1,6 @@
+../Core/Src/stm32_lpm_if.c:80:6:PWR_EnterOffMode	1
+../Core/Src/stm32_lpm_if.c:87:6:PWR_ExitOffMode	1
+../Core/Src/stm32_lpm_if.c:94:6:PWR_EnterStopMode	1
+../Core/Src/stm32_lpm_if.c:119:6:PWR_ExitStopMode	4
+../Core/Src/stm32_lpm_if.c:155:6:PWR_EnterSleepMode	1
+../Core/Src/stm32_lpm_if.c:169:6:PWR_ExitSleepMode	1

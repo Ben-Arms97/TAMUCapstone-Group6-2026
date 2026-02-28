@@ -1,0 +1,6 @@
+../Middlewares/LoRaWAN/Utilities/stm32_lpm.c:122:6:UTIL_LPM_Init	1
+../Middlewares/LoRaWAN/Utilities/stm32_lpm.c:129:6:UTIL_LPM_DeInit	1
+../Middlewares/LoRaWAN/Utilities/stm32_lpm.c:133:6:UTIL_LPM_SetStopMode	3
+../Middlewares/LoRaWAN/Utilities/stm32_lpm.c:158:6:UTIL_LPM_SetOffMode	3
+../Middlewares/LoRaWAN/Utilities/stm32_lpm.c:183:17:UTIL_LPM_GetMode	3
+../Middlewares/LoRaWAN/Utilities/stm32_lpm.c:216:6:UTIL_LPM_EnterLowPower	3
