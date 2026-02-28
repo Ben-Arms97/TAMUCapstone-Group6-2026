@@ -1,0 +1,8 @@
+../Drivers/CMSIS/Include/core_cm0plus.h:983:34:__NVIC_SystemReset	1
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpFirmwareManagement.c:144:15:LmhpFirmwareManagementPackageFactory	1
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpFirmwareManagement.c:150:13:LmhpFirmwareManagementInit	2
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpFirmwareManagement.c:167:13:LmhpFirmwareManagementIsInitialized	1
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpFirmwareManagement.c:172:13:LmhpFirmwareManagementIsRunning	2
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpFirmwareManagement.c:182:13:LmhpFirmwareManagementProcess	1
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpFirmwareManagement.c:187:13:LmhpFirmwareManagementOnMcpsIndication	14
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpFirmwareManagement.c:350:13:OnRebootTimer	0

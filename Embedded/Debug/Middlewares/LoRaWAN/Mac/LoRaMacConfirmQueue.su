@@ -1,0 +1,17 @@
+C:/Users/user1/Downloads/i-cube_lrwan/STM32CubeExpansion_LRWAN_V2.1.0/Middlewares/Third_Party/LoRaWAN/Mac/LoRaMacConfirmQueue.c:88:28:IncreaseBufferPointer	16	static
+C:/Users/user1/Downloads/i-cube_lrwan/STM32CubeExpansion_LRWAN_V2.1.0/Middlewares/Third_Party/LoRaWAN/Mac/LoRaMacConfirmQueue.c:103:28:DecreaseBufferPointer	16	static
+C:/Users/user1/Downloads/i-cube_lrwan/STM32CubeExpansion_LRWAN_V2.1.0/Middlewares/Third_Party/LoRaWAN/Mac/LoRaMacConfirmQueue.c:117:13:IsListEmpty	16	static
+C:/Users/user1/Downloads/i-cube_lrwan/STM32CubeExpansion_LRWAN_V2.1.0/Middlewares/Third_Party/LoRaWAN/Mac/LoRaMacConfirmQueue.c:126:13:IsListFull	16	static
+C:/Users/user1/Downloads/i-cube_lrwan/STM32CubeExpansion_LRWAN_V2.1.0/Middlewares/Third_Party/LoRaWAN/Mac/LoRaMacConfirmQueue.c:135:28:GetElement	32	static
+C:/Users/user1/Downloads/i-cube_lrwan/STM32CubeExpansion_LRWAN_V2.1.0/Middlewares/Third_Party/LoRaWAN/Mac/LoRaMacConfirmQueue.c:157:6:LoRaMacConfirmQueueInit	16	static
+C:/Users/user1/Downloads/i-cube_lrwan/STM32CubeExpansion_LRWAN_V2.1.0/Middlewares/Third_Party/LoRaWAN/Mac/LoRaMacConfirmQueue.c:174:6:LoRaMacConfirmQueueAdd	16	static
+C:/Users/user1/Downloads/i-cube_lrwan/STM32CubeExpansion_LRWAN_V2.1.0/Middlewares/Third_Party/LoRaWAN/Mac/LoRaMacConfirmQueue.c:195:6:LoRaMacConfirmQueueRemoveLast	8	static
+C:/Users/user1/Downloads/i-cube_lrwan/STM32CubeExpansion_LRWAN_V2.1.0/Middlewares/Third_Party/LoRaWAN/Mac/LoRaMacConfirmQueue.c:210:6:LoRaMacConfirmQueueRemoveFirst	8	static
+C:/Users/user1/Downloads/i-cube_lrwan/STM32CubeExpansion_LRWAN_V2.1.0/Middlewares/Third_Party/LoRaWAN/Mac/LoRaMacConfirmQueue.c:225:6:LoRaMacConfirmQueueSetStatus	24	static
+C:/Users/user1/Downloads/i-cube_lrwan/STM32CubeExpansion_LRWAN_V2.1.0/Middlewares/Third_Party/LoRaWAN/Mac/LoRaMacConfirmQueue.c:240:26:LoRaMacConfirmQueueGetStatus	24	static
+C:/Users/user1/Downloads/i-cube_lrwan/STM32CubeExpansion_LRWAN_V2.1.0/Middlewares/Third_Party/LoRaWAN/Mac/LoRaMacConfirmQueue.c:255:6:LoRaMacConfirmQueueSetStatusCmn	24	static
+C:/Users/user1/Downloads/i-cube_lrwan/STM32CubeExpansion_LRWAN_V2.1.0/Middlewares/Third_Party/LoRaWAN/Mac/LoRaMacConfirmQueue.c:277:26:LoRaMacConfirmQueueGetStatusCmn	8	static
+C:/Users/user1/Downloads/i-cube_lrwan/STM32CubeExpansion_LRWAN_V2.1.0/Middlewares/Third_Party/LoRaWAN/Mac/LoRaMacConfirmQueue.c:282:6:LoRaMacConfirmQueueIsCmdActive	16	static
+C:/Users/user1/Downloads/i-cube_lrwan/STM32CubeExpansion_LRWAN_V2.1.0/Middlewares/Third_Party/LoRaWAN/Mac/LoRaMacConfirmQueue.c:291:6:LoRaMacConfirmQueueHandleCb	24	static
+C:/Users/user1/Downloads/i-cube_lrwan/STM32CubeExpansion_LRWAN_V2.1.0/Middlewares/Third_Party/LoRaWAN/Mac/LoRaMacConfirmQueue.c:326:9:LoRaMacConfirmQueueGetCnt	8	static
+C:/Users/user1/Downloads/i-cube_lrwan/STM32CubeExpansion_LRWAN_V2.1.0/Middlewares/Third_Party/LoRaWAN/Mac/LoRaMacConfirmQueue.c:331:6:LoRaMacConfirmQueueIsFull	8	static

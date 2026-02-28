@@ -1,3 +1,4 @@
+#include "main.h"
 #include "sensor.h"
 
 Sensor_Values Read_Sensor(ADC_HandleTypeDef hadc) {

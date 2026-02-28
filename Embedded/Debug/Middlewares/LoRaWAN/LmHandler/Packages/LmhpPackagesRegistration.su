@@ -1,0 +1,2 @@
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpPackagesRegistration.c:40:24:LmhpPackagesRegistrationInit	8	static
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpPackagesRegistration.c:62:24:LmhpPackagesRegister	16	static

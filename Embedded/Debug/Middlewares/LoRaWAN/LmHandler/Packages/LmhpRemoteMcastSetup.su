@@ -1,0 +1,8 @@
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpRemoteMcastSetup.c:194:15:LmhpRemoteMcastSetupPackageFactory	8	static
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpRemoteMcastSetup.c:199:13:LmhpRemoteMcastSetupInit	40	static
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpRemoteMcastSetup.c:222:13:LmhpRemoteMcastSetupIsInitialized	8	static
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpRemoteMcastSetup.c:227:13:LmhpRemoteMcastSetupIsRunning	8	static
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpRemoteMcastSetup.c:237:13:LmhpRemoteMcastSetupProcess	24	static,ignoring_inline_asm
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpRemoteMcastSetup.c:282:13:LmhpRemoteMcastSetupOnMcpsIndication	112	static
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpRemoteMcastSetup.c:518:13:OnSessionStartTimer	16	static
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpRemoteMcastSetup.c:525:13:OnSessionStopTimer	16	static
