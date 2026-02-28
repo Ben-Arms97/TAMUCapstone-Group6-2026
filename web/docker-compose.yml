@@ -1,0 +1,58 @@
+version: "3.9"
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: bray_capstone_2026
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d bray_capstone_2026"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  server:
+    build: ./backend
+    env_file:
+      - ./backend/.env
+    ports:
+      - "127.0.0.1:5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+    develop:
+      watch:
+        - path: ./backend
+          action: sync+restart
+          target: /app
+        - path: ./backend/requirements.txt
+          action: rebuild
+
+  client:
+    build: ./frontend
+    env_file:
+      - ./frontend/.env
+    ports:
+      - "127.0.0.1:5173:5173"
+    depends_on:
+      - server
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
+    develop:
+      watch:
+        - path: ./frontend
+          action: sync+restart
+          target: /app
+
+volumes:
+  pgdata:
