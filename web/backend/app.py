@@ -25,6 +25,22 @@ def register_routes(app):
     def hello_world():
         return "Hello, World!"
     
+    @app.route('/event', methods=['GET'])
+    def get_events():
+        data = []
+
+        events = Event.query.all()
+        for event in events:
+            event_data = {
+                'id': event.id,
+                'angle': event.angle,
+                'battery': event.battery,
+                'timestamp': event.timestamp
+            }
+            data.append(event_data)
+
+        return jsonify({'events': data}), 200
+    
     @app.route("/event", methods=["POST"])
     def post_event():
         data = request.get_json(force=True)
