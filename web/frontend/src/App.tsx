@@ -9,6 +9,7 @@ function App() {
         <div className="flex-1 bg-white rounded-2xl border border-gray-200 p-8">
           <p className="text-gray-700 text-sm font-medium mb-3">Position Details</p>
           <ul className="space-y-1.5 text-sm text-gray-500">
+            <li>– Timestamp</li>
             <li>– Angle (degrees open)</li>
             <li>– Battery Percentage</li>
           </ul>
