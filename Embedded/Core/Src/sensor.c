@@ -1,6 +1,6 @@
 #include "sensor.h"
 
-Sensor_Values Read_Sensor(ADC_HandleTypeDef hadc) {
+Sensor_Values * Read_Sensor(ADC_HandleTypeDef hadc) {
     //ADC result values
     uint16_t adc_values[2];
 

@@ -5,7 +5,7 @@
 #include <math.h>
 
 //struct for calibrated values
-struct Calibrated_Values {
+struct Calibration_Values {
     uint16_t sin_max, sin_min, cos_max, cos_min;
 };
 
