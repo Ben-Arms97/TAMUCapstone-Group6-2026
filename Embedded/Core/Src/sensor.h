@@ -4,6 +4,15 @@
 // Includes
 #include <math.h>
 
+//struct for calibrated values
+struct Calibrated_Values {
+    uint16_t sin_max, sin_min, cos_max, cos_min;
+};
+
+struct Sensor_Values {
+    uint16_t sin, cos;
+};
+
 // Pin definitions - not sure if this is necessary
 #define COS_PIN    GPIO_PIN_2 //COS PIN - PA2
 #define COS_PORT   GPIOA
@@ -11,6 +20,8 @@
 #define SIN_PORT   GPIOA
 
 // Function definitions
-double Read_Sensor(ADC_HandleTypeDef* hadc);
+Sensor_Values * Read_Sensor(ADC_HandleTypeDef* hadc);
+
+float Calculate_Angle(Sensor_Values * s);
 
 #endif
