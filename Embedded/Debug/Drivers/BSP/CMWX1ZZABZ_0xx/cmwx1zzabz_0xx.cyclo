@@ -1,0 +1,17 @@
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/CMWX1ZZABZ_0xx/cmwx1zzabz_0xx.c:142:10:CMWX1ZZABZ0XX_RADIO_GetWakeUpTime	1
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/CMWX1ZZABZ_0xx/cmwx1zzabz_0xx.c:147:6:CMWX1ZZABZ0XX_RADIO_SetXO	2
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/CMWX1ZZABZ_0xx/cmwx1zzabz_0xx.c:161:6:CMWX1ZZABZ0XX_RADIO_IoInit	2
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/CMWX1ZZABZ_0xx/cmwx1zzabz_0xx.c:228:6:CMWX1ZZABZ0XX_RADIO_IoDeInit	2
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/CMWX1ZZABZ_0xx/cmwx1zzabz_0xx.c:253:6:CMWX1ZZABZ0XX_RADIO_IoIrqInit	2
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/CMWX1ZZABZ_0xx/cmwx1zzabz_0xx.c:272:6:CMWX1ZZABZ0XX_RADIO_IRQHandler	1
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/CMWX1ZZABZ_0xx/cmwx1zzabz_0xx.c:277:18:CMWX1ZZABZ0XX_RADIO_GetPaSelect	1
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/CMWX1ZZABZ_0xx/cmwx1zzabz_0xx.c:284:6:CMWX1ZZABZ0XX_RADIO_SetAntSw	6
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/CMWX1ZZABZ_0xx/cmwx1zzabz_0xx.c:322:6:CMWX1ZZABZ0XX_RADIO_CheckRfFrequency	1
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/CMWX1ZZABZ_0xx/cmwx1zzabz_0xx.c:328:6:CMWX1ZZABZ0XX_RADIO_Reset	1
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/CMWX1ZZABZ_0xx/cmwx1zzabz_0xx.c:354:6:CMWX1ZZABZ0XX_RADIO_Bus_Init	1
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/CMWX1ZZABZ_0xx/cmwx1zzabz_0xx.c:359:6:CMWX1ZZABZ0XX_RADIO_Bus_deInit	1
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/CMWX1ZZABZ_0xx/cmwx1zzabz_0xx.c:369:10:CMWX1ZZABZ0XX_RADIO_SendRecv	1
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/CMWX1ZZABZ_0xx/cmwx1zzabz_0xx.c:379:6:CMWX1ZZABZ0XX_RADIO_ChipSelect	2
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/CMWX1ZZABZ_0xx/cmwx1zzabz_0xx.c:391:10:CMWX1ZZABZ0XX_RADIO_GetDio1PinState	1
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/CMWX1ZZABZ_0xx/cmwx1zzabz_0xx.c:402:13:CMWX1ZZABZ0XX_RADIO_SPI_IoInit	1
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/CMWX1ZZABZ_0xx/cmwx1zzabz_0xx.c:438:13:CMWX1ZZABZ0XX_RADIO_SPI_IoDeInit	1

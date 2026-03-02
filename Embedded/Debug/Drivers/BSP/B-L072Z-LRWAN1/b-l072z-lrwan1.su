@@ -1,0 +1,8 @@
+../Drivers/CMSIS/Include/core_cm0plus.h:848:22:__NVIC_SetPriority	24	static
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/B-L072Z-LRWAN1/b-l072z-lrwan1.c:93:10:BSP_GetVersion	8	static
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/B-L072Z-LRWAN1/b-l072z-lrwan1.c:105:6:BSP_LED_Init	56	static
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/B-L072Z-LRWAN1/b-l072z-lrwan1.c:128:6:BSP_LED_On	16	static
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/B-L072Z-LRWAN1/b-l072z-lrwan1.c:140:6:BSP_LED_Off	16	static
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/B-L072Z-LRWAN1/b-l072z-lrwan1.c:152:6:BSP_LED_Toggle	16	static
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/B-L072Z-LRWAN1/b-l072z-lrwan1.c:168:6:BSP_PB_Init	40	static
+C:/Users/user1/Downloads/i-cube_lrwan2/STM32CubeExpansion_LRWAN_V2.1.0/Drivers/BSP/B-L072Z-LRWAN1/b-l072z-lrwan1.c:206:10:BSP_PB_GetState	16	static

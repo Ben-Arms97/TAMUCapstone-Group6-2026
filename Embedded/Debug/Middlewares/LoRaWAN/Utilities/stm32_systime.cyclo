@@ -1,0 +1,13 @@
+../Middlewares/LoRaWAN/Utilities/stm32_systime.c:200:11:SysTimeAdd	2
+../Middlewares/LoRaWAN/Utilities/stm32_systime.c:214:11:SysTimeSub	2
+../Middlewares/LoRaWAN/Utilities/stm32_systime.c:228:6:SysTimeSet	1
+../Middlewares/LoRaWAN/Utilities/stm32_systime.c:243:11:SysTimeGet	1
+../Middlewares/LoRaWAN/Utilities/stm32_systime.c:260:11:SysTimeGetMcuTime	1
+../Middlewares/LoRaWAN/Utilities/stm32_systime.c:269:10:SysTimeToMs	1
+../Middlewares/LoRaWAN/Utilities/stm32_systime.c:279:11:SysTimeFromMs	1
+../Middlewares/LoRaWAN/Utilities/stm32_systime.c:290:10:SysTimeMkTime	1
+../Middlewares/LoRaWAN/Utilities/stm32_systime.c:319:6:SysTimeLocalTime	2
+../Middlewares/LoRaWAN/Utilities/stm32_systime.c:382:17:CalendarGetMonth	6
+../Middlewares/LoRaWAN/Utilities/stm32_systime.c:419:13:CalendarDiv86400	3
+../Middlewares/LoRaWAN/Utilities/stm32_systime.c:445:17:CalendarDiv61	3
+../Middlewares/LoRaWAN/Utilities/stm32_systime.c:467:13:CalendarDiv60	3

@@ -1,0 +1,8 @@
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpFragmentation.c:211:13:OnFragmentTxDelay	1
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpFragmentation.c:220:15:LmhpFragmentationPackageFactory	1
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpFragmentation.c:225:9:LmhpFragmentationGetPackageVersion	1
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpFragmentation.c:230:13:LmhpFragmentationInit	3
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpFragmentation.c:255:13:LmhpFragmentationIsInitialized	1
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpFragmentation.c:260:13:LmhpFragmentationIsRunning	2
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpFragmentation.c:270:13:LmhpFragmentationProcess	4
+../Middlewares/LoRaWAN/LmHandler/Packages/LmhpFragmentation.c:304:13:LmhpFragmentationOnMcpsIndication	32
