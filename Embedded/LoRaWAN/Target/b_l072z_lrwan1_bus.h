@@ -24,7 +24,7 @@
 #ifndef __NUCLEO_L073RZ_BUS_H
 #define __NUCLEO_L073RZ_BUS_H
 
-#include "cmwx1zzabz_0xx_conf.h"
+#include "stm32l0xx_nucleo_conf.h"
 #include "b_l072z_lrwan1_errno.h"
 
 #ifdef __cplusplus
