@@ -22,6 +22,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "sensor.h"
+#include <math.h>
+#include <stdlib.h>
 
 /* USER CODE END Includes */
 
@@ -43,6 +45,8 @@
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc;
 
+UART_HandleTypeDef huart1;
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -51,6 +55,7 @@ ADC_HandleTypeDef hadc;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_ADC_Init(void);
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -78,6 +83,10 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
+  float last_sensor_angle = 0;
+  int angle_change_thresh_percent = 15;
+  uint8_t angle_buffer_string[20] = "Percent";
+
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -90,6 +99,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_ADC_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   hal_status_t status = HAL_ADC_Start(hadc);
 
@@ -102,6 +112,25 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+	// Retrieve current ADC values using Read Sensor()
+	// Calculate Angle
+	float stand_in_angle = 15
+	float percent_diff = (fabs(stand_in_angle - last_sensor_angle) / ((stand_in_angle + last_sensor_angle)/2)) * 100;
+	if (percent_diff > angle_change_thresh_percent) {
+		last_sensor_angle = stand_in_angle;
+		uint8_t transmit_buffer[10] =ftoa();
+		// Had to change setting to enable this. Project -> Properties -> C/C++ Build -> Settings -> MCU/MPU Settings -> "Use float with printf"
+		snprintf(transmit_buffer, 10, "%.1f", last_sensor_angle);
+		HAL_UART_Trsnamit(&huart, transmit_buffer, 10, 10);
+	}
+
+	// Need to add waiting period to check for more changes before sleeping.
+	// Enter Stop Mode:
+	HAL_UART_Transmit(&huart1, "Entering Standby...\n\r", 25, 10);
+	HAL_SuspendTick();
+	HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
+
   }
   /* USER CODE END 3 */
 }
@@ -114,6 +143,7 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Configure the main internal regulator output voltage
   */
@@ -144,6 +174,12 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1;
+  PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK2;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
   }
@@ -214,18 +250,61 @@ static void MX_ADC_Init(void)
 }
 
 /**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
   /* USER CODE BEGIN MX_GPIO_Init_1 */
 
   /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+
+  /*Configure GPIO pin : PA0 */
+  GPIO_InitStruct.Pin = GPIO_PIN_0;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
@@ -233,6 +312,18 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+// Handle Interrupt Wake up
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+
+	if(GPIO_Pin == GPIO_PIN_0)
+    {
+		HAL_UART_Transmit(&huart3, "Exiting Standby...\n\r", 23, 10);
+		SystemClock_Config();
+        HAL_ResumeTick();
+    }
+}
 
 /* USER CODE END 4 */
 
