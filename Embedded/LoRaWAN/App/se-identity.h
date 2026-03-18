@@ -86,6 +86,10 @@ extern "C" {
  ******************************************************************************
  */
 
+/* Replace with local device credentials before flashing.
+ * Do not commit real LoRaWAN keys to the public repository.
+ */
+
 /*!
  * When set to 1 DevEui is LORAWAN_DEVICE_EUI
  * When set to 0 DevEui is automatically set with a value provided by MCU platform
@@ -95,14 +99,13 @@ extern "C" {
 /*!
  * end-device IEEE EUI (big endian)
  */
-//#define LORAWAN_DEVICE_EUI                                 { 0x00, 0x80, 0xE1, 0x01, 0x01, 0x01, 0x01, 0x01 }
-#define LORAWAN_DEVICE_EUI                                 {  0x50, 0x59, 0x47, 0x00, 0x00, 0x01, 0x00, 0x12 }
+#define LORAWAN_DEVICE_EUI                                 { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
 
 /*!
  * App/Join server IEEE EUI (big endian)
  */
-//#define LORAWAN_JOIN_EUI                                   { 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 }
-#define LORAWAN_JOIN_EUI 									{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0x00 }
+#define LORAWAN_JOIN_EUI                                   { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
+
 /*!
  * When set to 1 DevAddr is LORAWAN_DEVICE_ADDRESS
  * When set to 0 DevAddr is automatically set with a value provided by a pseudo
@@ -118,23 +121,19 @@ extern "C" {
 /*!
  * Application root key
  */
-//#define LORAWAN_APP_KEY                                    2B,7E,15,16,28,AE,D2,A6,AB,F7,15,88,09,CF,4F,3C
-#define LORAWAN_APP_KEY 									76,ec,0b,18,56,5a,30,97,60,b6,a1,8f,ce,8a,1d,c7
+#define LORAWAN_APP_KEY                                    00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00
 /*!
  * Network root key
  */
-//#define LORAWAN_NWK_KEY                                    2B,7E,15,16,28,AE,D2,A6,AB,F7,15,88,09,CF,4F,3C
-#define LORAWAN_NWK_KEY										LORAWAN_APP_KEY
+#define LORAWAN_NWK_KEY                                    LORAWAN_APP_KEY
 /*!
  * Forwarding Network session key
  */
-//#define LORAWAN_NWK_S_KEY                                  2B,7E,15,16,28,AE,D2,A6,AB,F7,15,88,09,CF,4F,3C
-#define LORAWAN_NWK_S_KEY								LORAWAN_NWK_KEY
+#define LORAWAN_NWK_S_KEY                                  LORAWAN_NWK_KEY
 /*!
  * Application session key
  */
-//#define LORAWAN_APP_S_KEY                                  2B,7E,15,16,28,AE,D2,A6,AB,F7,15,88,09,CF,4F,3C
-#define LORAWAN_APP_S_KEY								LORAWAN_APP_KEY
+#define LORAWAN_APP_S_KEY                                  LORAWAN_APP_KEY
 
 /*!
  * Format commissioning keys
@@ -180,8 +179,7 @@ extern "C" {
              * WARNING: NOT USED FOR 1.0.x DEVICES. MUST BE THE SAME AS \ref LORAWAN_F_NWK_S_INT_KEY                \
              */                                                                                                     \
             .KeyID    = S_NWK_S_INT_KEY,                                                                            \
-            .KeyValue = { 0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, \
-                          0x3C },                                                                                   \
+            .KeyValue = FORMAT_KEY(LORAWAN_NWK_S_KEY),                                                              \
         },                                                                                                          \
         {                                                                                                           \
             /*!                                                                                                     \
@@ -189,8 +187,7 @@ extern "C" {
              * WARNING: NOT USED FOR 1.0.x DEVICES. MUST BE THE SAME AS \ref LORAWAN_F_NWK_S_INT_KEY                \
              */                                                                                                     \
             .KeyID    = NWK_S_ENC_KEY,                                                                              \
-            .KeyValue = { 0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, \
-                          0x3C },                                                                                   \
+            .KeyValue = FORMAT_KEY(LORAWAN_NWK_S_KEY),                                                              \
         },                                                                                                          \
         {                                                                                                           \
             /*!                                                                                                     \
