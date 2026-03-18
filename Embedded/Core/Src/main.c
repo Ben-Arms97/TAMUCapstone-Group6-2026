@@ -24,6 +24,7 @@
 #include "sensor.h"
 #include "app_lorawan.h"
 #include "adc.h"
+#include <stdio.h>
 
 /* USER CODE END Includes */
 
@@ -105,8 +106,14 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	HAL_UART_Transmit(&huart1, (uint8_t *)"ABCDEFGHIJ\r\n", 12, HAL_MAX_DELAY);
-	HAL_Delay(1000);
+	Sensor_Values sensor_values = Read_Sensor(&hadc);
+	char msg[64];
+	int len = snprintf(msg, sizeof(msg), "sin=%u cos=%u\r\n", sensor_values.sin, sensor_values.cos);
+	if (len > 0)
+	{
+	  HAL_UART_Transmit(&huart1, (uint8_t *)msg, (uint16_t)len, HAL_MAX_DELAY);
+	}
+	HAL_Delay(1);
   }
   /* USER CODE END 3 */
 }
