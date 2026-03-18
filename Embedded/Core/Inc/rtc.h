@@ -26,6 +26,8 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "stm32l0xx_hal_rtc.h"
+#include "stm32l0xx_hal_rtc_ex.h"
 
 /* USER CODE BEGIN Includes */
 #define RTC_PREDIV_A    ((uint32_t)0x007F)

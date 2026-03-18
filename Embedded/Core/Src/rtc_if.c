@@ -58,9 +58,9 @@ typedef struct
 #define MIN_ALARM_DELAY               3 /* in ticks */
 /* RTC Ticks/ms conversion */
 
-#define RTC_BKP_SECONDS    RTC_BKP_DR0
-#define RTC_BKP_SUBSECONDS RTC_BKP_DR1
-#define RTC_BKP_MSBTICKS   RTC_BKP_DR2
+#define RTC_BKP_SECONDS    RTC_BKP0R
+#define RTC_BKP_SUBSECONDS RTC_BKP1R
+#define RTC_BKP_MSBTICKS   RTC_BKP2R
 
 /* Sub-second mask definition  */
 #define RTC_ALARMSUBSECONDMASK    RTC_N_PREDIV_S<<RTC_ALRMASSR_MASKSS_Pos

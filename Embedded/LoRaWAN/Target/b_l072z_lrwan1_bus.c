@@ -453,7 +453,7 @@ int32_t BSP_I2C1_Init(void)
         {
           ret = BSP_ERROR_BUS_FAILURE;
         }
-        else if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
+        else if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLED) != HAL_OK)
         {
           ret = BSP_ERROR_BUS_FAILURE;
         }
@@ -741,7 +741,7 @@ __weak HAL_StatusTypeDef MX_I2C1_Init(I2C_HandleTypeDef *hi2c)
     ret = HAL_ERROR;
   }
 
-  if (HAL_I2CEx_ConfigAnalogFilter(hi2c, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
+  if (HAL_I2CEx_ConfigAnalogFilter(hi2c, I2C_ANALOGFILTER_ENABLED) != HAL_OK)
   {
     ret = HAL_ERROR;
   }
