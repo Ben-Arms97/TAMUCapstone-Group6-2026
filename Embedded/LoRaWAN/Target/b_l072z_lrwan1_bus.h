@@ -26,6 +26,9 @@
 
 #include "stm32l0xx_nucleo_conf.h"
 #include "b_l072z_lrwan1_errno.h"
+#include "stm32l0xx_hal_spi.h"
+#include "stm32l0xx_hal_i2c.h"
+#include "stm32l0xx_hal_i2c_ex.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -84,7 +87,7 @@ int32_t BSP_GetTick(void);
 
 #if (USE_HAL_SPI_REGISTER_CALLBACKS == 1)
 int32_t BSP_BUS_RegisterDefaultMspCallbacks(void);
-int32_t BSP_BUS_RegisterMspCallbacks(BSP_BUS_Cb_t *Callbacks);
+int32_t BSP_BUS_RegisterMspCallbacks(BSP_SPI_Cb_t *Callbacks);
 #endif /* ((USE_HAL_I2C_REGISTER_CALLBACKS == 1) || (USE_HAL_SPI_REGISTER_CALLBACKS == 1)) */
 
 #define BUS_I2C1_INSTANCE I2C1
