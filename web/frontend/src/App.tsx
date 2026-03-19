@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 type EventItem = {
   id: string;
   angle: number;
@@ -90,7 +92,7 @@ function App() {
   const { isPending: eventsLoading, isError: eventsError, data } = useQuery<EventsResponse>({
     queryKey: ["events"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:5000/event");
+      const res = await fetch(`${API_URL}/event`);
       if (!res.ok) {
         throw new Error(`Request failed with status ${res.status}`);
       }
