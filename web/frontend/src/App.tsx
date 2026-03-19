@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 type EventItem = {
@@ -84,47 +84,9 @@ function EmptyState() {
   );
 }
 
-function EventTable({ events }: { events: EventItem[] }) {
-  return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
-      <div className="grid grid-cols-3 border-b border-gray-200 bg-gray-50 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
-        <span>Timestamp</span>
-        <span className="text-center">Angle</span>
-        <span className="text-right">Battery</span>
-      </div>
-
-      <div className="max-h-105 overflow-y-auto">
-        {events.map((event) => (
-          <div
-            key={event.id}
-            className="grid grid-cols-3 items-center border-b border-gray-100 px-5 py-4 text-sm transition hover:bg-gray-50 last:border-b-0"
-          >
-            <div className="flex flex-col">
-              <span className="font-semibold text-gray-800">
-                {formatTime(event.timestamp)}
-              </span>
-              <span className="text-xs text-gray-400">
-                {formatDate(event.timestamp)}
-              </span>
-            </div>
-
-            <div className="text-center font-semibold text-gray-700">
-              {event.angle}°
-            </div>
-
-            <div className="text-right">
-              <span className={`font-semibold ${getBatteryColor(event.battery)}`}>
-                {event.battery}%
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function App() {
+  const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
+
   const { isPending: eventsLoading, isError: eventsError, data } = useQuery<EventsResponse>({
     queryKey: ["events"],
     queryFn: async () => {
@@ -144,8 +106,6 @@ function App() {
     );
   }, [data]);
 
-  const latestEvent = events[0];
-
   return (
     <div className="h-full bg-gray-50 px-12 py-10 ">
       <div className="mx-auto flex max-w-7xl flex-col gap-6">
@@ -159,17 +119,17 @@ function App() {
               Position Details
             </p>
 
-            {latestEvent ? (
+            {selectedEvent ? (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div className="rounded-xl bg-gray-50 px-4 py-3">
                   <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
                     Timestamp
                   </p>
                   <p className="mt-2 text-sm font-semibold text-gray-800">
-                    {formatTime(latestEvent.timestamp)}
+                    {formatTime(selectedEvent.timestamp)}
                   </p>
                   <p className="text-xs text-gray-400">
-                    {formatDate(latestEvent.timestamp)}
+                    {formatDate(selectedEvent.timestamp)}
                   </p>
                 </div>
 
@@ -178,7 +138,7 @@ function App() {
                     Angle
                   </p>
                   <p className="mt-2 text-sm font-semibold text-gray-800">
-                    {latestEvent.angle}°
+                    {selectedEvent.angle}°
                   </p>
                   <p className="text-xs text-gray-400">Degrees open</p>
                 </div>
@@ -189,13 +149,13 @@ function App() {
                   </p>
                   <p
                     className={`mt-2 text-sm font-semibold ${getBatteryColor(
-                      latestEvent.battery
+                      selectedEvent.battery
                     )}`}
                   >
-                    {latestEvent.battery}%
+                    {selectedEvent.battery}%
                   </p>
                   <p className="text-xs text-gray-400">
-                    {getBatteryLabel(latestEvent.battery)}
+                    {getBatteryLabel(selectedEvent.battery)}
                   </p>
                 </div>
               </div>
@@ -224,7 +184,42 @@ function App() {
           ) : events.length === 0 ? (
             <EmptyState />
           ) : (
-            <EventTable events={events} />
+            <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+              <div className="grid grid-cols-3 border-b border-gray-200 bg-gray-50 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <span>Timestamp</span>
+                <span className="text-center">Angle</span>
+                <span className="text-right">Battery</span>
+              </div>
+
+              <div className="max-h-105 overflow-y-auto">
+                {events.map((event) => (
+                  <div
+                    key={event.id}
+                    className={`grid grid-cols-3 items-center border-b border-gray-100 px-5 py-4 text-sm ${selectedEvent?.id == event.id ? 'bg-gray-50' : ''} transition hover:bg-gray-50 last:border-b-0`}
+                    onClick={() => setSelectedEvent(event)}
+                  >
+                    <div className="flex flex-col">
+                      <span className="font-semibold text-gray-800">
+                        {formatTime(event.timestamp)}
+                      </span>
+                      <span className="text-xs text-gray-400">
+                        {formatDate(event.timestamp)}
+                      </span>
+                    </div>
+
+                    <div className="text-center font-semibold text-gray-700">
+                      {event.angle}°
+                    </div>
+
+                    <div className="text-right">
+                      <span className={`font-semibold ${getBatteryColor(event.battery)}`}>
+                        {event.battery}%
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
         </div>
       </div>
