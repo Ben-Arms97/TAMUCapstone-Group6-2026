@@ -1,0 +1,10 @@
+services:
+  server:
+    env_file:
+      - ./backend/.env.prod
+    network_mode: host
+    ports: []
+
+  db:
+    ports:
+      - "5432:5432"

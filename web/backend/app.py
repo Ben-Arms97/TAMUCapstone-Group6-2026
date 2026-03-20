@@ -1,15 +1,21 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
+import threading
 from dotenv import load_dotenv
+
+from utils.sniff_packets import start_packet_sniffing, get_captured_packets
 
 from database import db, Event
 
 load_dotenv()
 
+lock = threading.Lock()
+
+start_packet_sniffing()
+
 def create_app():
     app = Flask(__name__)
-    
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('POSTGRESQL_CONNECTION_STRING')
 
     CORS(app, supports_credentials=True)
@@ -24,7 +30,7 @@ def register_routes(app):
     @app.route("/")
     def hello_world():
         return "Hello, World!"
-    
+
     @app.route('/event', methods=['GET'])
     def get_events():
         data = []
@@ -40,7 +46,7 @@ def register_routes(app):
             data.append(event_data)
 
         return jsonify({'events': data}), 200
-    
+
     @app.route("/event", methods=["POST"])
     def post_event():
         data = request.get_json(force=True)
@@ -65,6 +71,11 @@ def register_routes(app):
             "battery": new_event.battery,
             "timestamp": new_event.timestamp
         }), 201
-    
+
+    @app.route("/packets")
+    def get_packets():
+        with lock:
+            return jsonify(list(get_captured_packets()))
+
 app = create_app()
 register_routes(app)
