@@ -25,6 +25,7 @@
 #include "app_lorawan.h"
 #include "adc.h"
 #include <stdio.h>
+#include <string.h>
 
 /* USER CODE END Includes */
 
@@ -35,7 +36,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+static void uart_print(const char *s);
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -60,7 +61,10 @@ static void MX_USART1_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+static void uart_print(const char *s)
+{
+  HAL_UART_Transmit(&huart1, (uint8_t *)s, (uint16_t)strlen(s), HAL_MAX_DELAY);
+}
 /* USER CODE END 0 */
 
 /**
@@ -80,7 +84,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+  RTC_IF_Init();
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -96,7 +100,7 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   (void)HAL_ADC_Start(&hadc);
-//  MX_LoRaWAN_Init();
+  MX_LoRaWAN_Init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -106,14 +110,8 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	Sensor_Values sensor_values = Read_Sensor(&hadc);
-	char msg[64];
-	int len = snprintf(msg, sizeof(msg), "sin=%u cos=%u\r\n", sensor_values.sin, sensor_values.cos);
-	if (len > 0)
-	{
-	  HAL_UART_Transmit(&huart1, (uint8_t *)msg, (uint16_t)len, HAL_MAX_DELAY);
-	}
-	HAL_Delay(1);
+	uart_print("test");
+	HAL_Delay(200);
   }
   /* USER CODE END 3 */
 }
