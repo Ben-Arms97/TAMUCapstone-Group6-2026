@@ -104,7 +104,7 @@ int main(void)
   MX_ADC_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  //adc_dma_init();
+  /* Configuration stage start*/
 
   /* USER CODE END 2 */
 
@@ -120,31 +120,18 @@ int main(void)
 
 	char msg[64];
 
-	sConfig.Channel = ADC_CHANNEL_2;
-	HAL_ADC_ConfigChannel(&hadc, &sConfig);
+    Read_Angle_Sensor();
 
-	HAL_ADC_Start(&hadc);
-	HAL_ADC_PollForConversion(&hadc, HAL_MAX_DELAY);
-	adc_values[0] = HAL_ADC_GetValue(&hadc);
-	HAL_ADC_Stop(&hadc);
-
-	// --- Channel 3 ---
-	sConfig.Channel = ADC_CHANNEL_3;
-	HAL_ADC_ConfigChannel(&hadc, &sConfig);
-
-	HAL_ADC_Start(&hadc);
-	HAL_ADC_PollForConversion(&hadc, HAL_MAX_DELAY);
-	adc_values[1] = HAL_ADC_GetValue(&hadc);
-	HAL_ADC_Stop(&hadc);
-
+    // Debugging
 	int len = snprintf(msg, sizeof(msg), "sin=%u cos=%u\r\n", adc_values[0], adc_values[1]);
 	HAL_UART_Transmit(&huart1, (uint8_t *)msg, (uint16_t)strlen(msg), HAL_MAX_DELAY);
 	HAL_Delay(1000);
 
+    // Angle Calculation
     float sin = adc_values[0]/4096 - 0.5;
     float cos = adc_values[1]/4096 - 0.5;
-	// Calculate Angle
-	float angle = atan2(s.sin, s.cos) - init;
+
+	float angle = atan2(adc_values[0], adc_values[1]); //- init
 //	float percent_diff = (fabs(stand_in_angle - last_sensor_angle) / ((stand_in_angle + last_sensor_angle)/2)) * 100;
 //	if (percent_diff > angle_change_thresh_percent) {
 //		last_sensor_angle = stand_in_angle;
@@ -153,7 +140,7 @@ int main(void)
 //	 	snprintf(transmit_buffer, 10, "%.1f", last_sensor_angle);
 //		HAL_UART_Transmit(&huart, transmit_buffer, 10, 10);
 //	}
-	int len = snprintf(msg, sizeof(msg), "sin=%f cos=%f, angle=%f\r\n", sin[0], cos[1], angle);
+	len = snprintf(msg, sizeof(msg), "sin=%f cos=%f, angle=%f\r\n", adc_values[0], adc_values[1], angle);
 	HAL_UART_Transmit(&huart1, (uint8_t *)msg, (uint16_t)strlen(msg), HAL_MAX_DELAY);
 	HAL_Delay(1000);
 
@@ -266,13 +253,6 @@ static void MX_ADC_Init(void)
     Error_Handler();
   }
 
-  /** Configure for the selected ADC regular channel to be converted.
-  */
-  sConfig.Channel = ADC_CHANNEL_3;
-  if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
   /* USER CODE BEGIN ADC_Init 2 */
 
   /* USER CODE END ADC_Init 2 */
@@ -352,6 +332,26 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 		SystemClock_Config();
         HAL_ResumeTick();
     }
+}
+
+void Read_Angle_Sensor(){
+    // Channel 2
+	sConfig.Channel = ADC_CHANNEL_2;
+	HAL_ADC_ConfigChannel(&hadc, &sConfig);
+
+	HAL_ADC_Start(&hadc);
+	HAL_ADC_PollForConversion(&hadc, HAL_MAX_DELAY);
+	adc_values[0] = HAL_ADC_GetValue(&hadc);
+	HAL_ADC_Stop(&hadc);
+
+	// Channel 3
+	sConfig.Channel = ADC_CHANNEL_3;
+	HAL_ADC_ConfigChannel(&hadc, &sConfig);
+
+	HAL_ADC_Start(&hadc);
+	HAL_ADC_PollForConversion(&hadc, HAL_MAX_DELAY);
+	adc_values[1] = HAL_ADC_GetValue(&hadc);
+	HAL_ADC_Stop(&hadc);
 }
 
 /* USER CODE END 4 */

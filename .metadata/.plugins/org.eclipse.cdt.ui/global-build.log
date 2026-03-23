@@ -7878,3 +7878,309 @@ Finished building: default.size.stdout
  
 Finished building: Embedded.list
  
+18:02:20 **** Incremental Build of configuration Debug for project Embedded ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m0plus -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L082xx -c -I../Core/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L0xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:123:5: warning: implicit declaration of function 'Read_Angle_Sensor' [-Wimplicit-function-declaration]
+  123 |     Read_Angle_Sensor();
+      |     ^~~~~~~~~~~~~~~~~
+../Core/Src/main.c:126:19: warning: implicit declaration of function 'snprintf' [-Wimplicit-function-declaration]
+  126 |         int len = snprintf(msg, sizeof(msg), "sin=%u cos=%u\r\n", adc_values[0], adc_values[1]);
+      |                   ^~~~~~~~
+../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+   26 | #include <string.h>
+  +++ |+#include <stdio.h>
+   27 | 
+../Core/Src/main.c:126:19: warning: incompatible implicit declaration of built-in function 'snprintf' [-Wbuiltin-declaration-mismatch]
+  126 |         int len = snprintf(msg, sizeof(msg), "sin=%u cos=%u\r\n", adc_values[0], adc_values[1]);
+      |                   ^~~~~~~~
+../Core/Src/main.c:126:19: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+../Core/Src/main.c:134:29: error: 's' undeclared (first use in this function)
+  134 |         float angle = atan2(s.sin, s.cos) - init;
+      |                             ^
+../Core/Src/main.c:134:29: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:134:45: error: 'init' undeclared (first use in this function); did you mean 'int'?
+  134 |         float angle = atan2(s.sin, s.cos) - init;
+      |                                             ^~~~
+      |                                             int
+../Core/Src/main.c:143:13: error: redefinition of 'len'
+  143 |         int len = snprintf(msg, sizeof(msg), "sin=%f cos=%f, angle=%f\r\n", sin[0], cos[1], angle);
+      |             ^~~
+../Core/Src/main.c:126:13: note: previous definition of 'len' with type 'int'
+  126 |         int len = snprintf(msg, sizeof(msg), "sin=%u cos=%u\r\n", adc_values[0], adc_values[1]);
+      |             ^~~
+../Core/Src/main.c:143:80: error: subscripted value is neither array nor pointer nor vector
+  143 |         int len = snprintf(msg, sizeof(msg), "sin=%f cos=%f, angle=%f\r\n", sin[0], cos[1], angle);
+      |                                                                                ^
+../Core/Src/main.c:143:88: error: subscripted value is neither array nor pointer nor vector
+  143 |         int len = snprintf(msg, sizeof(msg), "sin=%f cos=%f, angle=%f\r\n", sin[0], cos[1], angle);
+      |                                                                                        ^
+../Core/Src/main.c:143:13: warning: unused variable 'len' [-Wunused-variable]
+  143 |         int len = snprintf(msg, sizeof(msg), "sin=%f cos=%f, angle=%f\r\n", sin[0], cos[1], angle);
+      |             ^~~
+../Core/Src/main.c:132:11: warning: variable 'cos' set but not used [-Wunused-but-set-variable]
+  132 |     float cos = adc_values[1]/4096 - 0.5;
+      |           ^~~
+../Core/Src/main.c:131:11: warning: variable 'sin' set but not used [-Wunused-but-set-variable]
+  131 |     float sin = adc_values[0]/4096 - 0.5;
+      |           ^~~
+../Core/Src/main.c:91:11: warning: unused variable 'angle_buffer_string' [-Wunused-variable]
+   91 |   uint8_t angle_buffer_string[20] = "Percent";
+      |           ^~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:90:7: warning: unused variable 'angle_change_thresh_percent' [-Wunused-variable]
+   90 |   int angle_change_thresh_percent = 15;
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:89:9: warning: unused variable 'last_sensor_angle' [-Wunused-variable]
+   89 |   float last_sensor_angle = 0;
+      |         ^~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:331:44: warning: pointer targets in passing argument 2 of 'HAL_UART_Transmit' differ in signedness [-Wpointer-sign]
+  331 |                 HAL_UART_Transmit(&huart1, "Exiting Standby...\n\r", 23, 10);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~
+      |                                            |
+      |                                            char *
+In file included from ../Core/Inc/stm32l0xx_hal_conf.h:281,
+                 from ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart.h:1508:79: note: expected 'const uint8_t *' {aka 'const unsigned char *'} but argument is of type 'char *'
+ 1508 | HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, const uint8_t *pData, uint16_t Size, uint32_t Timeout);
+      |                                                                ~~~~~~~~~~~~~~~^~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:37:13: warning: 'uart_print' declared 'static' but never defined [-Wunused-function]
+   37 | static void uart_print(const char * s);
+      |             ^~~~~~~~~~
+make: *** [Core/Src/subdir.mk:34: Core/Src/main.o] Error 1
+"make -j16 all" terminated with exit code 2. Build might be incomplete.
+18:03:14 **** Incremental Build of configuration Debug for project Embedded ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m0plus -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L082xx -c -I../Core/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L0xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:123:5: warning: implicit declaration of function 'Read_Angle_Sensor' [-Wimplicit-function-declaration]
+  123 |     Read_Angle_Sensor();
+      |     ^~~~~~~~~~~~~~~~~
+../Core/Src/main.c:126:19: warning: implicit declaration of function 'snprintf' [-Wimplicit-function-declaration]
+  126 |         int len = snprintf(msg, sizeof(msg), "sin=%u cos=%u\r\n", adc_values[0], adc_values[1]);
+      |                   ^~~~~~~~
+../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+   26 | #include <string.h>
+  +++ |+#include <stdio.h>
+   27 | 
+../Core/Src/main.c:126:19: warning: incompatible implicit declaration of built-in function 'snprintf' [-Wbuiltin-declaration-mismatch]
+  126 |         int len = snprintf(msg, sizeof(msg), "sin=%u cos=%u\r\n", adc_values[0], adc_values[1]);
+      |                   ^~~~~~~~
+../Core/Src/main.c:126:19: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+../Core/Src/main.c:134:61: error: 'init' undeclared (first use in this function); did you mean 'int'?
+  134 |         float angle = atan2(adc_values[0], adc_values[1]) - init;
+      |                                                             ^~~~
+      |                                                             int
+../Core/Src/main.c:134:61: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:143:13: error: redefinition of 'len'
+  143 |         int len = snprintf(msg, sizeof(msg), "sin=%f cos=%f, angle=%f\r\n", adc_values[0], adc_values[1], angle);
+      |             ^~~
+../Core/Src/main.c:126:13: note: previous definition of 'len' with type 'int'
+  126 |         int len = snprintf(msg, sizeof(msg), "sin=%u cos=%u\r\n", adc_values[0], adc_values[1]);
+      |             ^~~
+../Core/Src/main.c:143:52: warning: format '%f' expects argument of type 'double', but argument 4 has type 'int' [-Wformat=]
+  143 |         int len = snprintf(msg, sizeof(msg), "sin=%f cos=%f, angle=%f\r\n", adc_values[0], adc_values[1], angle);
+      |                                                   ~^                        ~~~~~~~~~~~~~
+      |                                                    |                                  |
+      |                                                    double                             int
+      |                                                   %d
+../Core/Src/main.c:143:59: warning: format '%f' expects argument of type 'double', but argument 5 has type 'int' [-Wformat=]
+  143 |         int len = snprintf(msg, sizeof(msg), "sin=%f cos=%f, angle=%f\r\n", adc_values[0], adc_values[1], angle);
+      |                                                          ~^                                ~~~~~~~~~~~~~
+      |                                                           |                                          |
+      |                                                           double                                     int
+      |                                                          %d
+../Core/Src/main.c:143:13: warning: unused variable 'len' [-Wunused-variable]
+  143 |         int len = snprintf(msg, sizeof(msg), "sin=%f cos=%f, angle=%f\r\n", adc_values[0], adc_values[1], angle);
+      |             ^~~
+../Core/Src/main.c:132:11: warning: unused variable 'cos' [-Wunused-variable]
+  132 |     float cos = adc_values[1]/4096 - 0.5;
+      |           ^~~
+../Core/Src/main.c:131:11: warning: unused variable 'sin' [-Wunused-variable]
+  131 |     float sin = adc_values[0]/4096 - 0.5;
+      |           ^~~
+../Core/Src/main.c:91:11: warning: unused variable 'angle_buffer_string' [-Wunused-variable]
+   91 |   uint8_t angle_buffer_string[20] = "Percent";
+      |           ^~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:90:7: warning: unused variable 'angle_change_thresh_percent' [-Wunused-variable]
+   90 |   int angle_change_thresh_percent = 15;
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:89:9: warning: unused variable 'last_sensor_angle' [-Wunused-variable]
+   89 |   float last_sensor_angle = 0;
+      |         ^~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:331:44: warning: pointer targets in passing argument 2 of 'HAL_UART_Transmit' differ in signedness [-Wpointer-sign]
+  331 |                 HAL_UART_Transmit(&huart1, "Exiting Standby...\n\r", 23, 10);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~
+      |                                            |
+      |                                            char *
+In file included from ../Core/Inc/stm32l0xx_hal_conf.h:281,
+                 from ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart.h:1508:79: note: expected 'const uint8_t *' {aka 'const unsigned char *'} but argument is of type 'char *'
+ 1508 | HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, const uint8_t *pData, uint16_t Size, uint32_t Timeout);
+      |                                                                ~~~~~~~~~~~~~~~^~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:37:13: warning: 'uart_print' declared 'static' but never defined [-Wunused-function]
+   37 | static void uart_print(const char * s);
+      |             ^~~~~~~~~~
+make: *** [Core/Src/subdir.mk:34: Core/Src/main.o] Error 1
+"make -j16 all" terminated with exit code 2. Build might be incomplete.
+18:04:23 **** Incremental Build of configuration Debug for project Embedded ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m0plus -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L082xx -c -I../Core/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L0xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:123:5: warning: implicit declaration of function 'Read_Angle_Sensor' [-Wimplicit-function-declaration]
+  123 |     Read_Angle_Sensor();
+      |     ^~~~~~~~~~~~~~~~~
+../Core/Src/main.c:126:19: warning: implicit declaration of function 'snprintf' [-Wimplicit-function-declaration]
+  126 |         int len = snprintf(msg, sizeof(msg), "sin=%u cos=%u\r\n", adc_values[0], adc_values[1]);
+      |                   ^~~~~~~~
+../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+   26 | #include <string.h>
+  +++ |+#include <stdio.h>
+   27 | 
+../Core/Src/main.c:126:19: warning: incompatible implicit declaration of built-in function 'snprintf' [-Wbuiltin-declaration-mismatch]
+  126 |         int len = snprintf(msg, sizeof(msg), "sin=%u cos=%u\r\n", adc_values[0], adc_values[1]);
+      |                   ^~~~~~~~
+../Core/Src/main.c:126:19: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+../Core/Src/main.c:143:48: warning: format '%f' expects argument of type 'double', but argument 4 has type 'int' [-Wformat=]
+  143 |         len = snprintf(msg, sizeof(msg), "sin=%f cos=%f, angle=%f\r\n", adc_values[0], adc_values[1], angle);
+      |                                               ~^                        ~~~~~~~~~~~~~
+      |                                                |                                  |
+      |                                                double                             int
+      |                                               %d
+../Core/Src/main.c:143:55: warning: format '%f' expects argument of type 'double', but argument 5 has type 'int' [-Wformat=]
+  143 |         len = snprintf(msg, sizeof(msg), "sin=%f cos=%f, angle=%f\r\n", adc_values[0], adc_values[1], angle);
+      |                                                      ~^                                ~~~~~~~~~~~~~
+      |                                                       |                                          |
+      |                                                       double                                     int
+      |                                                      %d
+../Core/Src/main.c:132:11: warning: unused variable 'cos' [-Wunused-variable]
+  132 |     float cos = adc_values[1]/4096 - 0.5;
+      |           ^~~
+../Core/Src/main.c:131:11: warning: unused variable 'sin' [-Wunused-variable]
+  131 |     float sin = adc_values[0]/4096 - 0.5;
+      |           ^~~
+../Core/Src/main.c:126:13: warning: variable 'len' set but not used [-Wunused-but-set-variable]
+  126 |         int len = snprintf(msg, sizeof(msg), "sin=%u cos=%u\r\n", adc_values[0], adc_values[1]);
+      |             ^~~
+../Core/Src/main.c:91:11: warning: unused variable 'angle_buffer_string' [-Wunused-variable]
+   91 |   uint8_t angle_buffer_string[20] = "Percent";
+      |           ^~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:90:7: warning: unused variable 'angle_change_thresh_percent' [-Wunused-variable]
+   90 |   int angle_change_thresh_percent = 15;
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:89:9: warning: unused variable 'last_sensor_angle' [-Wunused-variable]
+   89 |   float last_sensor_angle = 0;
+      |         ^~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:331:44: warning: pointer targets in passing argument 2 of 'HAL_UART_Transmit' differ in signedness [-Wpointer-sign]
+  331 |                 HAL_UART_Transmit(&huart1, "Exiting Standby...\n\r", 23, 10);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~
+      |                                            |
+      |                                            char *
+In file included from ../Core/Inc/stm32l0xx_hal_conf.h:281,
+                 from ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart.h:1508:79: note: expected 'const uint8_t *' {aka 'const unsigned char *'} but argument is of type 'char *'
+ 1508 | HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, const uint8_t *pData, uint16_t Size, uint32_t Timeout);
+      |                                                                ~~~~~~~~~~~~~~~^~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:37:13: warning: 'uart_print' declared 'static' but never defined [-Wunused-function]
+   37 | static void uart_print(const char * s);
+      |             ^~~~~~~~~~
+arm-none-eabi-gcc -o "Embedded.elf" @"objects.list"   -mcpu=cortex-m0plus -T"C:\Users\Benho\Projects\TAMUCapstone-Group6-2026\Embedded\STM32L082CZYX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Embedded.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+C:/ST/STM32CubeIDE_1.15.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.100.202509120712/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/bin/ld.exe: ./Core/Src/main.o: in function `main':
+C:/Users/Benho/Projects/TAMUCapstone-Group6-2026/Embedded/Debug/../Core/Src/main.c:123:(.text.main+0x3c): undefined reference to `Read_Angle_Sensor'
+collect2.exe: error: ld returned 1 exit status
+make: *** [makefile:64: Embedded.elf] Error 1
+"make -j16 all" terminated with exit code 2. Build might be incomplete.
+18:04:58 **** Incremental Build of configuration Debug for project Embedded ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m0plus -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L082xx -c -I../Core/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L0xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:123:5: warning: implicit declaration of function 'Read_Angle_Sensor' [-Wimplicit-function-declaration]
+  123 |     Read_Angle_Sensor();
+      |     ^~~~~~~~~~~~~~~~~
+../Core/Src/main.c:126:19: warning: implicit declaration of function 'snprintf' [-Wimplicit-function-declaration]
+  126 |         int len = snprintf(msg, sizeof(msg), "sin=%u cos=%u\r\n", adc_values[0], adc_values[1]);
+      |                   ^~~~~~~~
+../Core/Src/main.c:27:1: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+   26 | #include <string.h>
+  +++ |+#include <stdio.h>
+   27 | 
+../Core/Src/main.c:126:19: warning: incompatible implicit declaration of built-in function 'snprintf' [-Wbuiltin-declaration-mismatch]
+  126 |         int len = snprintf(msg, sizeof(msg), "sin=%u cos=%u\r\n", adc_values[0], adc_values[1]);
+      |                   ^~~~~~~~
+../Core/Src/main.c:126:19: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+../Core/Src/main.c:143:48: warning: format '%f' expects argument of type 'double', but argument 4 has type 'int' [-Wformat=]
+  143 |         len = snprintf(msg, sizeof(msg), "sin=%f cos=%f, angle=%f\r\n", adc_values[0], adc_values[1], angle);
+      |                                               ~^                        ~~~~~~~~~~~~~
+      |                                                |                                  |
+      |                                                double                             int
+      |                                               %d
+../Core/Src/main.c:143:55: warning: format '%f' expects argument of type 'double', but argument 5 has type 'int' [-Wformat=]
+  143 |         len = snprintf(msg, sizeof(msg), "sin=%f cos=%f, angle=%f\r\n", adc_values[0], adc_values[1], angle);
+      |                                                      ~^                                ~~~~~~~~~~~~~
+      |                                                       |                                          |
+      |                                                       double                                     int
+      |                                                      %d
+../Core/Src/main.c:132:11: warning: unused variable 'cos' [-Wunused-variable]
+  132 |     float cos = adc_values[1]/4096 - 0.5;
+      |           ^~~
+../Core/Src/main.c:131:11: warning: unused variable 'sin' [-Wunused-variable]
+  131 |     float sin = adc_values[0]/4096 - 0.5;
+      |           ^~~
+../Core/Src/main.c:126:13: warning: variable 'len' set but not used [-Wunused-but-set-variable]
+  126 |         int len = snprintf(msg, sizeof(msg), "sin=%u cos=%u\r\n", adc_values[0], adc_values[1]);
+      |             ^~~
+../Core/Src/main.c:91:11: warning: unused variable 'angle_buffer_string' [-Wunused-variable]
+   91 |   uint8_t angle_buffer_string[20] = "Percent";
+      |           ^~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:90:7: warning: unused variable 'angle_change_thresh_percent' [-Wunused-variable]
+   90 |   int angle_change_thresh_percent = 15;
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:89:9: warning: unused variable 'last_sensor_angle' [-Wunused-variable]
+   89 |   float last_sensor_angle = 0;
+      |         ^~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:331:44: warning: pointer targets in passing argument 2 of 'HAL_UART_Transmit' differ in signedness [-Wpointer-sign]
+  331 |                 HAL_UART_Transmit(&huart1, "Exiting Standby...\n\r", 23, 10);
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~
+      |                                            |
+      |                                            char *
+In file included from ../Core/Inc/stm32l0xx_hal_conf.h:281,
+                 from ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart.h:1508:79: note: expected 'const uint8_t *' {aka 'const unsigned char *'} but argument is of type 'char *'
+ 1508 | HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, const uint8_t *pData, uint16_t Size, uint32_t Timeout);
+      |                                                                ~~~~~~~~~~~~~~~^~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:337:6: warning: conflicting types for 'Read_Angle_Sensor'; have 'void()'
+  337 | void Read_Angle_Sensor(){
+      |      ^~~~~~~~~~~~~~~~~
+../Core/Src/main.c:123:5: note: previous implicit declaration of 'Read_Angle_Sensor' with type 'void()'
+  123 |     Read_Angle_Sensor();
+      |     ^~~~~~~~~~~~~~~~~
+../Core/Src/main.c:37:13: warning: 'uart_print' declared 'static' but never defined [-Wunused-function]
+   37 | static void uart_print(const char * s);
+      |             ^~~~~~~~~~
+arm-none-eabi-gcc -o "Embedded.elf" @"objects.list"   -mcpu=cortex-m0plus -T"C:\Users\Benho\Projects\TAMUCapstone-Group6-2026\Embedded\STM32L082CZYX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Embedded.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: Embedded.elf
+ 
+arm-none-eabi-size  Embedded.elf 
+arm-none-eabi-objdump -h -S Embedded.elf  > "Embedded.list"
+   text	   data	    bss	    dec	    hex	filename
+  36652	    468	   2148	  39268	   9964	Embedded.elf
+Finished building: default.size.stdout
+ 
+Finished building: Embedded.list
+ 
