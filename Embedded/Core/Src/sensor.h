@@ -83,19 +83,4 @@ void adc_dma_start(void)
     DMA1->IFCR |= DMA_IFCR_CTCIF1;  // Clear flag
 }
 
-Sensor_Values * Read_Sensor() {
-
-    HAL_ADC_Start_DMA(&hadc, (uint16_t*)adc_values, 2);
-    HAL_ADC_Stop_DMA(&hadc);
-
-    Sensor_Values s;
-    s.sin = adc_values[0]/4096 - 0.5;
-    s.cos = adc_values[1]/4096 - 0.5;
-    return &s;
-}
-
-float Calculate_Angle(Sensor_Values s, Sensor_Values init) {
-    return atan2(s.sin, s.cos) - init;
-}
-
 #endif

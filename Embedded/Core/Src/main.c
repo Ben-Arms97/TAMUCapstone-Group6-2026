@@ -21,9 +21,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "sensor.h"
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* USER CODE END Includes */
 
@@ -34,7 +34,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+static void uart_print(const char * s);
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -46,6 +46,8 @@
 ADC_HandleTypeDef hadc;
 
 UART_HandleTypeDef huart1;
+
+ADC_ChannelConfTypeDef sConfig = {0};
 
 /* USER CODE BEGIN PV */
 
@@ -64,60 +66,6 @@ static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN 0 */
 uint16_t adc_values[2];
 
-void adc_dma_init(void)
-{
-    // Enable clocks
-    RCC->IOPENR |= RCC_IOPENR_GPIOAEN;
-    RCC->APB2ENR |= RCC_APB2ENR_ADC1EN;
-    RCC->AHBENR |= RCC_AHBENR_DMA1EN;
-
-    // PA2, PA3 analog
-    GPIOA->MODER |= (3 << (2 * 2)) | (3 << (3 * 2));
-    GPIOA->PUPDR &= ~((3 << (2 * 2)) | (3 << (3 * 2)));
-
-    // DMA setup
-    DMA1_Channel1->CCR = 0;
-    DMA1_Channel1->CPAR = (uint32_t)&ADC1->DR;
-    DMA1_Channel1->CMAR = (uint32_t)adc_values;
-    DMA1_Channel1->CNDTR = 2;
-
-    DMA1_Channel1->CCR |= DMA_CCR_MINC | DMA_CCR_PSIZE_0 | DMA_CCR_MSIZE_0;
-    DMA1_Channel1->CCR |= DMA_CCR_EN;
-
-    // Disable ADC
-    if (ADC1->CR & ADC_CR_ADEN) {
-        ADC1->CR |= ADC_CR_ADDIS;
-        while (ADC1->CR & ADC_CR_ADEN);
-    }
-
-    // Calibrate
-    ADC1->CR |= ADC_CR_ADCAL;
-    while (ADC1->CR & ADC_CR_ADCAL);
-
-    // Configure ADC
-    ADC1->CFGR1 = ADC_CFGR1_DMAEN;
-    ADC1->SMPR |= ADC_SMPR_SMP_1;
-    ADC1->CHSELR = ADC_CHSELR_CHSEL2 | ADC_CHSELR_CHSEL3;
-
-    // Enable ADC
-    ADC1->CR |= ADC_CR_ADEN;
-    while (!(ADC1->ISR & ADC_ISR_ADRDY));
-}
-
-void adc_dma_start(void)
-{
-    DMA1_Channel1->CCR &= ~DMA_CCR_EN;
-    DMA1_Channel1->CNDTR = 2;
-    DMA1_Channel1->CCR |= DMA_CCR_EN;
-
-    ADC1->CR |= ADC_CR_ADSTART;
-}
-
-void adc_dma_wait(void)
-{
-    while (!(DMA1->ISR & DMA_ISR_TCIF1));
-    DMA1->IFCR |= DMA_IFCR_CTCIF1;
-}
 /* USER CODE END 0 */
 
 /**
@@ -156,7 +104,7 @@ int main(void)
   MX_ADC_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  adc_dma_init();
+  //adc_dma_init();
 
   /* USER CODE END 2 */
 
@@ -169,31 +117,51 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
 	// Retrieve current ADC values
-    adc_dma_start();
-    adc_dma_wait();
 
-    Sensor_Values s;
-    s.sin = adc_values[0]/4096 - 0.5;
-    s.cos = adc_values[1]/4096 - 0.5;
+	char msg[64];
+
+	sConfig.Channel = ADC_CHANNEL_2;
+	HAL_ADC_ConfigChannel(&hadc, &sConfig);
+
+	HAL_ADC_Start(&hadc);
+	HAL_ADC_PollForConversion(&hadc, HAL_MAX_DELAY);
+	adc_values[0] = HAL_ADC_GetValue(&hadc);
+	HAL_ADC_Stop(&hadc);
+
+	// --- Channel 3 ---
+	sConfig.Channel = ADC_CHANNEL_3;
+	HAL_ADC_ConfigChannel(&hadc, &sConfig);
+
+	HAL_ADC_Start(&hadc);
+	HAL_ADC_PollForConversion(&hadc, HAL_MAX_DELAY);
+	adc_values[1] = HAL_ADC_GetValue(&hadc);
+	HAL_ADC_Stop(&hadc);
+
+	int len = snprintf(msg, sizeof(msg), "sin=%u cos=%u\r\n", adc_values[0], adc_values[1]);
+	HAL_UART_Transmit(&huart1, (uint8_t *)msg, (uint16_t)strlen(msg), HAL_MAX_DELAY);
+	HAL_Delay(1000);
+
+    float sin = adc_values[0]/4096 - 0.5;
+    float cos = adc_values[1]/4096 - 0.5;
 	// Calculate Angle
-	// float angle = atan2(s.sin, s.cos) - init;
-	// float percent_diff = (fabs(stand_in_angle - last_sensor_angle) / ((stand_in_angle + last_sensor_angle)/2)) * 100;
-	// if (percent_diff > angle_change_thresh_percent) {
-	// 	last_sensor_angle = stand_in_angle;
-	// 	uint8_t transmit_buffer[10] =ftoa();
-	// 	// Had to change setting to enable this. Project -> Properties -> C/C++ Build -> Settings -> MCU/MPU Settings -> "Use float with printf"
-	// 	snprintf(transmit_buffer, 10, "%.1f", last_sensor_angle);
-	// 	HAL_UART_Transmit(&huart, transmit_buffer, 10, 10);
-	// }
-    char msg[64];
-	int len = snprintf(msg, sizeof(msg), "sin=%u cos=%u\r\n", s.sin, s.cos);
-    HAL_UART_Transmit(&huart1, (uint8_t *)msg, (uint16_t)len, HAL_MAX_DELAY);
+	float angle = atan2(s.sin, s.cos) - init;
+//	float percent_diff = (fabs(stand_in_angle - last_sensor_angle) / ((stand_in_angle + last_sensor_angle)/2)) * 100;
+//	if (percent_diff > angle_change_thresh_percent) {
+//		last_sensor_angle = stand_in_angle;
+//		uint8_t transmit_buffer[10] =ftoa();
+//	 	// Had to change setting to enable this. Project -> Properties -> C/C++ Build -> Settings -> MCU/MPU Settings -> "Use float with printf"
+//	 	snprintf(transmit_buffer, 10, "%.1f", last_sensor_angle);
+//		HAL_UART_Transmit(&huart, transmit_buffer, 10, 10);
+//	}
+	int len = snprintf(msg, sizeof(msg), "sin=%f cos=%f, angle=%f\r\n", sin[0], cos[1], angle);
+	HAL_UART_Transmit(&huart1, (uint8_t *)msg, (uint16_t)strlen(msg), HAL_MAX_DELAY);
+	HAL_Delay(1000);
 
 	// Need to add waiting period to check for more changes before sleeping.
 	// Enter Stop Mode:
-	HAL_UART_Transmit(&huart1, "Entering Standby...\n\r", 25, 10);
-	HAL_SuspendTick();
-	HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
+//	HAL_UART_Transmit(&huart1, "Entering Standby...\n\r", 25, 10);
+//	HAL_SuspendTick();
+//	HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
 
   }
   /* USER CODE END 3 */
@@ -261,8 +229,6 @@ static void MX_ADC_Init(void)
 
   /* USER CODE END ADC_Init 0 */
 
-  ADC_ChannelConfTypeDef sConfig = {0};
-
   /* USER CODE BEGIN ADC_Init 1 */
 
   /* USER CODE END ADC_Init 1 */
@@ -281,7 +247,7 @@ static void MX_ADC_Init(void)
   hadc.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   hadc.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc.Init.DMAContinuousRequests = DISABLE;
-  hadc.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  hadc.Init.EOCSelection = ADC_EOC_SEQ_CONV;
   hadc.Init.Overrun = ADC_OVR_DATA_PRESERVED;
   hadc.Init.LowPowerAutoWait = DISABLE;
   hadc.Init.LowPowerFrequencyMode = DISABLE;
@@ -361,7 +327,6 @@ static void MX_GPIO_Init(void)
   /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin : PA0 */
@@ -383,7 +348,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 	if(GPIO_Pin == GPIO_PIN_0)
     {
-		HAL_UART_Transmit(&huart3, "Exiting Standby...\n\r", 23, 10);
+		HAL_UART_Transmit(&huart1, "Exiting Standby...\n\r", 23, 10);
 		SystemClock_Config();
         HAL_ResumeTick();
     }
