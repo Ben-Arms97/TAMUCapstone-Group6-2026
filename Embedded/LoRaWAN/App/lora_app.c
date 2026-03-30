@@ -37,6 +37,7 @@
 #include "sys_conf.h"
 #include "CayenneLpp.h"
 #include "sys_sensors.h"
+#include "cmwx1zzabz_0xx.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -214,7 +215,39 @@ static UTIL_TIMER_Object_t JoinLedTimer;
 
 /* Exported functions ---------------------------------------------------------*/
 /* USER CODE BEGIN EF */
+#include "cmwx1zzabz_0xx.h"
+#include "sys_app.h"
 
+static uint8_t RadioReadReg(uint8_t addr)
+{
+  uint16_t tx;
+  uint16_t rx;
+  uint8_t value;
+
+  CMWX1ZZABZ0XX_RADIO_ChipSelect(0);
+
+  tx = addr & 0x7F;   // read
+  rx = CMWX1ZZABZ0XX_RADIO_SendRecv(tx);
+
+  tx = 0x00;
+  rx = CMWX1ZZABZ0XX_RADIO_SendRecv(tx);
+  value = (uint8_t)rx;
+
+  CMWX1ZZABZ0XX_RADIO_ChipSelect(1);
+
+  return value;
+}
+
+static void DebugRadioRegs(void)
+{
+	for (int i = 0; i < 5; i++)
+	{
+	    uint8_t ver = RadioReadReg(0x42);
+	    APP_LOG(TS_ON, VLEVEL_L, "SX1276 RegVersion[%d]=0x%02X\r\n", i, ver);
+	    HAL_Delay(50);
+	}
+  uint8_t op  = RadioReadReg(0x01);
+}
 /* USER CODE END EF */
 
 void LoRaWAN_Init(void)
@@ -264,7 +297,7 @@ void LoRaWAN_Init(void)
 
   /* USER CODE BEGIN LoRaWAN_Init_2 */
   UTIL_TIMER_Start(&JoinLedTimer);
-
+  DebugRadioRegs();
   /* USER CODE END LoRaWAN_Init_2 */
 
   LmHandlerJoin(ActivationType);
@@ -295,7 +328,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   switch (GPIO_Pin)
   {
-    case  USER_BUTTON_PIN:
+    case USER_BUTTON_PIN:
       UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_LoRaSendOnTxTimerOrButtonEvent), CFG_SEQ_Prio_0);
       break;
     default:
@@ -381,94 +414,48 @@ static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
 
 static void SendTxData(void)
 {
-  /* USER CODE BEGIN SendTxData_1 */
-  uint16_t pressure = 0;
-  int16_t temperature = 0;
-  sensor_t sensor_data;
   UTIL_TIMER_Time_t nextTxIn = 0;
+  uint8_t i = 0;
 
-#ifdef CAYENNE_LPP
-  uint8_t channel = 0;
-#else
-  uint16_t humidity = 0;
-  uint32_t i = 0;
-  int32_t latitude = 0;
-  int32_t longitude = 0;
-  uint16_t altitudeGps = 0;
-#endif /* CAYENNE_LPP */
-
-  EnvSensors_Read(&sensor_data);
-#if defined (SENSOR_ENABLED) && (SENSOR_ENABLED == 1)
-  temperature = (int16_t) sensor_data.temperature;
-#else
-  temperature = (SYS_GetTemperatureLevel() >> 8);
-#endif  /* SENSOR_ENABLED */
-  pressure    = (uint16_t)(sensor_data.pressure * 100 / 10);      /* in hPa / 10 */
+  /* Test constants */
+  uint8_t battery = 95;          // test battery value
+  int32_t latitude = 3075000;    // example scaled test value
+  int32_t longitude = -9675000;  // example scaled test value
 
   AppData.Port = LORAWAN_USER_APP_PORT;
 
-#ifdef CAYENNE_LPP
-  CayenneLppReset();
-  CayenneLppAddBarometricPressure(channel++, pressure);
-  CayenneLppAddTemperature(channel++, temperature);
-  CayenneLppAddRelativeHumidity(channel++, (uint16_t)(sensor_data.humidity));
+  AppData.Buffer[i++] = battery;
 
-  if ((LmHandlerParams.ActiveRegion != LORAMAC_REGION_US915) && (LmHandlerParams.ActiveRegion != LORAMAC_REGION_AU915)
-      && (LmHandlerParams.ActiveRegion != LORAMAC_REGION_AS923))
-  {
-    CayenneLppAddDigitalInput(channel++, GetBatteryLevel());
-    CayenneLppAddDigitalOutput(channel++, AppLedStateOn);
-  }
+  AppData.Buffer[i++] = (uint8_t)((latitude >> 16) & 0xFF);
+  AppData.Buffer[i++] = (uint8_t)((latitude >> 8) & 0xFF);
+  AppData.Buffer[i++] = (uint8_t)(latitude & 0xFF);
 
-  CayenneLppCopy(AppData.Buffer);
-  AppData.BufferSize = CayenneLppGetSize();
-#else  /* not CAYENNE_LPP */
-  humidity    = (uint16_t)(sensor_data.humidity * 10);            /* in %*10     */
-
-  AppData.Buffer[i++] = AppLedStateOn;
-  AppData.Buffer[i++] = (uint8_t)((pressure >> 8) & 0xFF);
-  AppData.Buffer[i++] = (uint8_t)(pressure & 0xFF);
-  AppData.Buffer[i++] = (uint8_t)(temperature & 0xFF);
-  AppData.Buffer[i++] = (uint8_t)((humidity >> 8) & 0xFF);
-  AppData.Buffer[i++] = (uint8_t)(humidity & 0xFF);
-
-  if ((LmHandlerParams.ActiveRegion == LORAMAC_REGION_US915) || (LmHandlerParams.ActiveRegion == LORAMAC_REGION_AU915)
-      || (LmHandlerParams.ActiveRegion == LORAMAC_REGION_AS923))
-  {
-    AppData.Buffer[i++] = 0;
-    AppData.Buffer[i++] = 0;
-    AppData.Buffer[i++] = 0;
-    AppData.Buffer[i++] = 0;
-  }
-  else
-  {
-    latitude = sensor_data.latitude;
-    longitude = sensor_data.longitude;
-
-    AppData.Buffer[i++] = GetBatteryLevel();        /* 1 (very low) to 254 (fully charged) */
-    AppData.Buffer[i++] = (uint8_t)((latitude >> 16) & 0xFF);
-    AppData.Buffer[i++] = (uint8_t)((latitude >> 8) & 0xFF);
-    AppData.Buffer[i++] = (uint8_t)(latitude & 0xFF);
-    AppData.Buffer[i++] = (uint8_t)((longitude >> 16) & 0xFF);
-    AppData.Buffer[i++] = (uint8_t)((longitude >> 8) & 0xFF);
-    AppData.Buffer[i++] = (uint8_t)(longitude & 0xFF);
-    AppData.Buffer[i++] = (uint8_t)((altitudeGps >> 8) & 0xFF);
-    AppData.Buffer[i++] = (uint8_t)(altitudeGps & 0xFF);
-  }
+  AppData.Buffer[i++] = (uint8_t)((longitude >> 16) & 0xFF);
+  AppData.Buffer[i++] = (uint8_t)((longitude >> 8) & 0xFF);
+  AppData.Buffer[i++] = (uint8_t)(longitude & 0xFF);
 
   AppData.BufferSize = i;
-#endif /* CAYENNE_LPP */
 
-  if (LORAMAC_HANDLER_SUCCESS == LmHandlerSend(&AppData, LORAWAN_DEFAULT_CONFIRMED_MSG_STATE, &nextTxIn, false))
+  LmHandlerErrorStatus_t status =
+      LmHandlerSend(&AppData, LORAWAN_DEFAULT_CONFIRMED_MSG_STATE, &nextTxIn, false);
+
+  APP_LOG(TS_ON, VLEVEL_L,
+          "LmHandlerSend status=%d nextTxIn=%lu joined-state unknown\r\n",
+          status, (unsigned long)nextTxIn);
+
+  if (status == LORAMAC_HANDLER_SUCCESS)
   {
-    APP_LOG(TS_ON, VLEVEL_L, "SEND REQUEST\r\n");
+    APP_LOG(TS_ON, VLEVEL_L, "SEND REQUEST: battery=%d lat=%ld lon=%ld\r\n",
+            battery, (long)latitude, (long)longitude);
   }
   else if (nextTxIn > 0)
   {
-    APP_LOG(TS_ON, VLEVEL_L, "Next Tx in  : ~%d second(s)\r\n", (nextTxIn / 1000));
+    APP_LOG(TS_ON, VLEVEL_L, "Next Tx in: ~%d second(s)\r\n", (nextTxIn / 1000));
   }
-
-  /* USER CODE END SendTxData_1 */
+  else
+  {
+    APP_LOG(TS_ON, VLEVEL_L, "SEND REQUEST FAILED: status=%d nextTxIn=%lu joined?\r\n");
+  }
 }
 
 static void OnTxTimerEvent(void *context)

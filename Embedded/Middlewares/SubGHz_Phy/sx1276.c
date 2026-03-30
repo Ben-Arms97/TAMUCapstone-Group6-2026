@@ -1766,11 +1766,11 @@ static void SX1276OnTimeoutIrq( void* context )
         break;
     }
 }
-
+#include "sys_app.h"
 static void SX1276OnDio0Irq( void )
 {
     volatile uint8_t irqFlags = 0;
-
+    APP_LOG(TS_ON, VLEVEL_L, "Dio0 IRQ &&&&&&&&&&&&&&&")
     switch( SX1276.Settings.State )
     {
         case RF_RX_RUNNING:
