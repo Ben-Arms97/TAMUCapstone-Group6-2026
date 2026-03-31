@@ -95,6 +95,7 @@ int main(void)
   /* USER CODE END SysInit */
   MX_LoRaWAN_Init();
 
+
   /* Initialize all configured peripherals */
   MX_ADC_Init();
   MX_USART1_UART_Init();
@@ -103,7 +104,25 @@ int main(void)
 
 
   /* USER CODE END 2 */
+  #include "radio.h"
+  #include "sys_app.h"
+  uint8_t SX1276_ReadReg(uint8_t addr)
+  {
+      uint8_t tx[2];
+      uint8_t rx[2];
 
+      tx[0] = addr & 0x7F;   // read
+      tx[1] = 0x00;
+
+      CMWX1ZZABZ0XX_RADIO_ChipSelect(0);
+      RADIO_SPI_SendRecv(tx, rx, 2);
+      CMWX1ZZABZ0XX_RADIO_ChipSelect(1);
+
+      return rx[1];
+  }
+
+  uint8_t v = SX1276_ReadReg(0x42);
+  APP_LOG(TS_ON, VLEVEL_L, "SX1276 Reg 0x42=0x%02X\r\n", v);
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)

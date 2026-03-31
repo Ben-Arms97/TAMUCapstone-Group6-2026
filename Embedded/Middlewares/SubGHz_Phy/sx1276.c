@@ -865,9 +865,10 @@ uint32_t SX1276GetTimeOnAir( RadioModems_t modem, uint32_t bandwidth,
     // Perform integral ceil()
     return ( numerator + denominator - 1 ) / denominator;
 }
-
+#include "sys_app.h"
 void SX1276Send( uint8_t *buffer, uint8_t size )
 {
+	APP_LOG(TS_OFF, VLEVEL_M, "SX1276 Radio Send\r\n");
     uint32_t txTimeout = 0;
 
     switch( SX1276.Settings.Modem )
@@ -1214,14 +1215,16 @@ void SX1276SetRx( uint32_t timeout )
     }
     else
     {
-        if( rxContinuous == true )
-        {
-            SX1276SetOpMode( RFLR_OPMODE_RECEIVER );
-        }
-        else
-        {
-            SX1276SetOpMode( RFLR_OPMODE_RECEIVER_SINGLE );
-        }
+//        if( rxContinuous == true )
+//        {
+//            SX1276SetOpMode( RFLR_OPMODE_RECEIVER );
+//        }
+//        else
+//        {
+//            SX1276SetOpMode( RFLR_OPMODE_RECEIVER_SINGLE );
+//        }
+    	// DEBUG: force continuous RX no matter what LoRaWAN requested
+    	SX1276SetOpMode( RFLR_OPMODE_RECEIVER );
     }
 }
 
@@ -1378,37 +1381,38 @@ static void SX1276SetOpMode( uint8_t opMode )
 {
     if( opMode == RF_OPMODE_SLEEP )
     {
-      SX1276Write( REG_OPMODE, ( SX1276Read( REG_OPMODE ) & RF_OPMODE_MASK ) | opMode );
-
-      Sx_Board_SetAntSw( RFSW_OFF );
-      
-      Sx_Board_SetXO( RESET ); 
+        SX1276Write( REG_OPMODE, ( SX1276Read( REG_OPMODE ) & RF_OPMODE_MASK ) | opMode );
+        Sx_Board_SetAntSw( RFSW_OFF );
+        Sx_Board_SetXO( RESET );
     }
-    else if ( opMode == RF_OPMODE_RECEIVER )
+    else if( ( opMode == RF_OPMODE_RECEIVER ) ||
+             ( opMode == RFLR_OPMODE_RECEIVER ) ||
+             ( opMode == RFLR_OPMODE_RECEIVER_SINGLE ) ||
+             ( opMode == RF_OPMODE_SYNTHESIZER_RX ) )
     {
-      // Enable TCXO if operating mode different from SLEEP.
-      Sx_Board_SetXO( SET ); 
-      
-      Sx_Board_SetAntSw( RFSW_RX );
-      
-      SX1276Write( REG_OPMODE, ( SX1276Read( REG_OPMODE ) & RF_OPMODE_MASK ) | opMode );
+        Sx_Board_SetXO( SET );
+        Sx_Board_SetAntSw( RFSW_RX );
+        SX1276Write( REG_OPMODE, ( SX1276Read( REG_OPMODE ) & RF_OPMODE_MASK ) | opMode );
+        APP_LOG(TS_ON, VLEVEL_M, "OpMode set: 0x%02X (Reg=0x%02X)\r\n",
+                opMode,
+                SX1276Read(REG_OPMODE));
     }
     else
     {
-      uint8_t paConfig =  SX1276Read( REG_PACONFIG );
-      // Enable TCXO if operating mode different from SLEEP.
-      Sx_Board_SetXO( SET ); 
+        uint8_t paConfig = SX1276Read( REG_PACONFIG );
 
-      if( ( paConfig & RF_PACONFIG_PASELECT_PABOOST ) == RF_PACONFIG_PASELECT_PABOOST )
-      {
-        Sx_Board_SetAntSw( RFSW_RFO_HP );
-      }
-      else
-      {
-        Sx_Board_SetAntSw( RFSW_RFO_LP );
-      }
-      
-      SX1276Write( REG_OPMODE, ( SX1276Read( REG_OPMODE ) & RF_OPMODE_MASK ) | opMode );
+        Sx_Board_SetXO( SET );
+
+        if( ( paConfig & RF_PACONFIG_PASELECT_PABOOST ) == RF_PACONFIG_PASELECT_PABOOST )
+        {
+            Sx_Board_SetAntSw( RFSW_RFO_HP );
+        }
+        else
+        {
+            Sx_Board_SetAntSw( RFSW_RFO_LP );
+        }
+
+        SX1276Write( REG_OPMODE, ( SX1276Read( REG_OPMODE ) & RF_OPMODE_MASK ) | opMode );
     }
 }
 
@@ -1693,6 +1697,7 @@ static uint32_t SX1276GetLoRaTimeOnAirNumerator( uint32_t bandwidth,
 
 static void SX1276OnTimeoutIrq( void* context )
 {
+	APP_LOG(TS_OFF, VLEVEL_M, "SX1276OnTimeoutIrq\r\n");
     switch( SX1276.Settings.State )
     {
     case RF_RX_RUNNING:
@@ -1770,7 +1775,7 @@ static void SX1276OnTimeoutIrq( void* context )
 static void SX1276OnDio0Irq( void )
 {
     volatile uint8_t irqFlags = 0;
-    APP_LOG(TS_ON, VLEVEL_L, "Dio0 IRQ &&&&&&&&&&&&&&&")
+    APP_LOG(TS_ON, VLEVEL_L, "Dio0 IRQ\r\n")
     switch( SX1276.Settings.State )
     {
         case RF_RX_RUNNING:
@@ -1932,6 +1937,11 @@ static void SX1276OnDio0Irq( void )
             break;
         case RF_TX_RUNNING:
             TimerStop( &TxTimeoutTimer );
+
+            char dbg[64];
+            snprintf(dbg, sizeof(dbg), "TX_DONE at %lu ms\r\n", HAL_GetTick());
+            APP_LOG(TS_ON, VLEVEL_M, dbg);
+
             // TxDone interrupt
             switch( SX1276.Settings.Modem )
             {

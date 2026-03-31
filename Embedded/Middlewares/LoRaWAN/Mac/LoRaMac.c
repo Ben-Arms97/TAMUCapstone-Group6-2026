@@ -55,6 +55,7 @@
 #include "LoRaMacAdr.h"
 #include "LoRaMacSerializer.h"
 #include "radio.h"
+#include "sys_app.h"
 
 #include "LoRaMac.h"
 #include "mw_log_conf.h"
@@ -1697,6 +1698,10 @@ static void OnTxDelayedTimerEvent( void* context )
 
 static void OnRxWindow1TimerEvent( void* context )
 {
+	char dbg[64];
+	snprintf(dbg, sizeof(dbg), "RX1_START at %lu ms\r\n", HAL_GetTick());
+	APP_LOG(TS_ON, VLEVEL_M, dbg);
+
     MacCtx.RxWindow1Config.Channel = MacCtx.Channel;
     MacCtx.RxWindow1Config.DrOffset = Nvm.MacGroup2.MacParams.Rx1DrOffset;
     MacCtx.RxWindow1Config.DownlinkDwellTime = Nvm.MacGroup2.MacParams.DownlinkDwellTime;
@@ -1711,6 +1716,10 @@ static void OnRxWindow2TimerEvent( void* context )
 {
     // Check if we are processing Rx1 window.
     // If yes, we don't setup the Rx2 window.
+	char dbg[64];
+	snprintf(dbg, sizeof(dbg), "RX2_START at %lu ms\r\n", HAL_GetTick());
+	APP_LOG(TS_ON, VLEVEL_M, dbg);
+
     if( MacCtx.RxSlot == RX_SLOT_WIN_1 )
     {
         return;
