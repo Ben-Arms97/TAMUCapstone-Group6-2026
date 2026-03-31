@@ -190,6 +190,8 @@ void CMWX1ZZABZ0XX_RADIO_Bus_Init(void);
  */
 void CMWX1ZZABZ0XX_RADIO_Bus_deInit(void);
 
+void CMWX1ZZABZ0XX_RADIO_IRQHandler(RADIO_DIO_TypeDef DIO);
+
 #ifdef __cplusplus
 }
 #endif

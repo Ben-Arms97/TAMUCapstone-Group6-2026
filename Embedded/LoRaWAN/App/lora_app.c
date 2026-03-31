@@ -215,39 +215,7 @@ static UTIL_TIMER_Object_t JoinLedTimer;
 
 /* Exported functions ---------------------------------------------------------*/
 /* USER CODE BEGIN EF */
-#include "cmwx1zzabz_0xx.h"
-#include "sys_app.h"
 
-static uint8_t RadioReadReg(uint8_t addr)
-{
-  uint16_t tx;
-  uint16_t rx;
-  uint8_t value;
-
-  CMWX1ZZABZ0XX_RADIO_ChipSelect(0);
-
-  tx = addr & 0x7F;   // read
-  rx = CMWX1ZZABZ0XX_RADIO_SendRecv(tx);
-
-  tx = 0x00;
-  rx = CMWX1ZZABZ0XX_RADIO_SendRecv(tx);
-  value = (uint8_t)rx;
-
-  CMWX1ZZABZ0XX_RADIO_ChipSelect(1);
-
-  return value;
-}
-
-static void DebugRadioRegs(void)
-{
-	for (int i = 0; i < 5; i++)
-	{
-	    uint8_t ver = RadioReadReg(0x42);
-	    APP_LOG(TS_ON, VLEVEL_L, "SX1276 RegVersion[%d]=0x%02X\r\n", i, ver);
-	    HAL_Delay(50);
-	}
-  uint8_t op  = RadioReadReg(0x01);
-}
 /* USER CODE END EF */
 
 void LoRaWAN_Init(void)
@@ -297,7 +265,6 @@ void LoRaWAN_Init(void)
 
   /* USER CODE BEGIN LoRaWAN_Init_2 */
   UTIL_TIMER_Start(&JoinLedTimer);
-  DebugRadioRegs();
   /* USER CODE END LoRaWAN_Init_2 */
 
   LmHandlerJoin(ActivationType);

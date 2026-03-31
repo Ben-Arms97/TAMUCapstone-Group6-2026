@@ -283,40 +283,30 @@ TxConfig_TypeDef CMWX1ZZABZ0XX_RADIO_GetPaSelect(uint32_t channel)
 
 void CMWX1ZZABZ0XX_RADIO_SetAntSw(RfSw_TypeDef state)
 {
+    /* Always clear all RF switch controls first */
+    HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_RX,       RADIO_ANT_SWITCH_PIN_RX,       GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_TX_RFO,   RADIO_ANT_SWITCH_PIN_TX_RFO,   GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_TX_BOOST, RADIO_ANT_SWITCH_PIN_TX_BOOST, GPIO_PIN_RESET);
 
-  switch (state)
-  {
-    case RFSW_RX:
+    switch (state)
     {
-      HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_RX, RADIO_ANT_SWITCH_PIN_RX, GPIO_PIN_SET);
-      break;
-    }
-    case RFSW_RFO_LP:
-    {
-      HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_TX_RFO, RADIO_ANT_SWITCH_PIN_TX_RFO, GPIO_PIN_SET);
-      break;
-    }
-    case RFSW_RFO_HP:
-    {
-      HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_TX_BOOST, RADIO_ANT_SWITCH_PIN_TX_BOOST, GPIO_PIN_SET);
-      break;
-    }
-    case RFSW_RFO_LF:
-    {
-      break;
-    }
-    case RFSW_OFF:
-      HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_RX, RADIO_ANT_SWITCH_PIN_RX, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_TX_RFO, RADIO_ANT_SWITCH_PIN_TX_RFO, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_TX_BOOST, RADIO_ANT_SWITCH_PIN_TX_BOOST, GPIO_PIN_RESET);
-      break;
-    default:
-      HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_RX, RADIO_ANT_SWITCH_PIN_RX, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_TX_RFO, RADIO_ANT_SWITCH_PIN_TX_RFO, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_TX_BOOST, RADIO_ANT_SWITCH_PIN_TX_BOOST, GPIO_PIN_RESET);
+        case RFSW_RX:
+            HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_RX, RADIO_ANT_SWITCH_PIN_RX, GPIO_PIN_SET);
+            break;
 
-      break;
-  }
+        case RFSW_RFO_LP:
+            HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_TX_RFO, RADIO_ANT_SWITCH_PIN_TX_RFO, GPIO_PIN_SET);
+            break;
+
+        case RFSW_RFO_HP:
+            HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_TX_BOOST, RADIO_ANT_SWITCH_PIN_TX_BOOST, GPIO_PIN_SET);
+            break;
+
+        case RFSW_RFO_LF:
+        case RFSW_OFF:
+        default:
+            break;
+    }
 }
 
 bool CMWX1ZZABZ0XX_RADIO_CheckRfFrequency(uint32_t frequency)
@@ -327,26 +317,24 @@ bool CMWX1ZZABZ0XX_RADIO_CheckRfFrequency(uint32_t frequency)
 
 void CMWX1ZZABZ0XX_RADIO_Reset(void)
 {
-  GPIO_InitTypeDef initStruct = { 0 };
+    GPIO_InitTypeDef initStruct = {0};
 
-  initStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  initStruct.Pull = GPIO_NOPULL;
-  initStruct.Speed = GPIO_SPEED_HIGH;
-  initStruct.Pin = RADIO_RESET_PIN;
+    RADIO_RESET_CLK_ENABLE();
 
-  // Set RESET pin to 0
-  HAL_GPIO_Init(RADIO_RESET_PORT, &initStruct);
-  HAL_GPIO_WritePin(RADIO_RESET_PORT, RADIO_RESET_PIN, GPIO_PIN_RESET);
+    initStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    initStruct.Pull = GPIO_NOPULL;
+    initStruct.Speed = GPIO_SPEED_HIGH;
+    initStruct.Pin = RADIO_RESET_PIN;
+    HAL_GPIO_Init(RADIO_RESET_PORT, &initStruct);
 
-  // Wait 1 ms
-  HAL_Delay(1);
+    HAL_GPIO_WritePin(RADIO_RESET_PORT, RADIO_RESET_PIN, GPIO_PIN_RESET);
+    HAL_Delay(1);
 
-  // Configure RESET as input
-  initStruct.Mode = GPIO_NOPULL;
-  HAL_GPIO_Init(RADIO_RESET_PORT, &initStruct);
+    initStruct.Mode = GPIO_MODE_INPUT;
+    initStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(RADIO_RESET_PORT, &initStruct);
 
-  // Wait 6 ms
-  HAL_Delay(6);
+    HAL_Delay(6);
 }
 
 /* Bus mapping to SPI */
@@ -399,9 +387,11 @@ uint32_t CMWX1ZZABZ0XX_RADIO_GetDio1PinState(void)
   * @param  hspi  SPI handler
   * @retval None
 */
+#include "sys_app.h"
 static void CMWX1ZZABZ0XX_RADIO_SPI_IoInit(SPI_HandleTypeDef *spiHandle)
 {
   GPIO_InitTypeDef GPIO_InitStruct;
+  APP_LOG(TS_ON, VLEVEL_L, "SPI_IoInit\r\n");
   /* USER CODE BEGIN SPI1_MspInit 0 */
 
   /* USER CODE END SPI1_MspInit 0 */
