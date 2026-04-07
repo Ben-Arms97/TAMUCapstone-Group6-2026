@@ -6,7 +6,7 @@ from datetime import datetime
 import paho.mqtt.client as mqtt
 
 class PacketSniffer():
-    def __init__(self, mqtt_host, mqtt_port, mqtt_topics):
+    def __init__(self, mqtt_host, mqtt_port, mqtt_topics, handle_incoming_message=None):
         super().__init__()
 
         self.packets = []
@@ -16,6 +16,8 @@ class PacketSniffer():
         self.MQTT_PORT = mqtt_port
         self.MQTT_TOPICS = mqtt_topics
 
+        self.handle_incoming_message = handle_incoming_message
+
     def _on_connect(self, client, userdata, flags, reason_code, properties=None):
         print(f"Connected to MQTT broker with code {reason_code}")
         for topic, qos in self.MQTT_TOPICS:
@@ -23,6 +25,9 @@ class PacketSniffer():
             print(f"Subscribed to {topic}")
 
     def _on_message(self, client, userdata, msg):
+        if(self.handle_incoming_message):
+            self.handle_incoming_message(msg)
+        
         payload_bytes = bytes(msg.payload)
 
         try:
