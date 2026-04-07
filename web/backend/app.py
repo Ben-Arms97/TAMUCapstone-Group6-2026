@@ -1,22 +1,28 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
-import threading
 from dotenv import load_dotenv
 
-from utils.sniff_packets import sniff_packets, get_captured_packets
+from utils.PacketSniffer import PacketSniffer
 
 from database import db, Event
 
 load_dotenv()
 
-lock = threading.Lock()
+MQTT_HOST = "mqtt"
+MQTT_PORT = 1883
+MQTT_TOPIC = os.getenv("MQTT_TOPIC")
 
-sniff_packets()
+test_packet_sniffer = PacketSniffer(MQTT_HOST, MQTT_PORT, [("#", 0)])
+test_packet_sniffer.sniff_packets()
+
+packet_sniffer = PacketSniffer(MQTT_HOST, MQTT_PORT, [(MQTT_TOPIC, 0)])
+packet_sniffer.sniff_packets()
 
 def create_app():
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('POSTGRESQL_CONNECTION_STRING')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+        'POSTGRESQL_CONNECTION_STRING')
 
     CORS(app, supports_credentials=True)
 
@@ -25,6 +31,7 @@ def create_app():
         db.create_all()
 
     return app
+
 
 def register_routes(app):
     @app.route("/")
@@ -74,8 +81,12 @@ def register_routes(app):
 
     @app.route("/packets")
     def log_packets():
-        with lock:
-            return jsonify(list(get_captured_packets()))
+        return jsonify(list(test_packet_sniffer.get_captured_packets()))
+
+    # TODO: Change this to /packets
+    @app.route("/prodpackets")
+    def log_prod_packets():
+        return jsonify(list(packet_sniffer.get_captured_packets()))
 
 app = create_app()
 register_routes(app)
