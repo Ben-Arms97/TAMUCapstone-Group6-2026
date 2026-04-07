@@ -4,7 +4,7 @@ import os
 import threading
 from dotenv import load_dotenv
 
-from utils.sniff_packets import start_packet_sniffing, get_captured_packets
+from utils.sniff_packets import sniff_packets, get_captured_packets
 
 from database import db, Event
 
@@ -12,7 +12,7 @@ load_dotenv()
 
 lock = threading.Lock()
 
-start_packet_sniffing()
+sniff_packets()
 
 def create_app():
     app = Flask(__name__)
@@ -73,7 +73,7 @@ def register_routes(app):
         }), 201
 
     @app.route("/packets")
-    def get_packets():
+    def log_packets():
         with lock:
             return jsonify(list(get_captured_packets()))
 
