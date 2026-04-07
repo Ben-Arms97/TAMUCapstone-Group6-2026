@@ -10,7 +10,7 @@ lock = threading.Lock()
 
 MQTT_HOST = "mqtt"
 MQTT_PORT = 1883
-MQTT_TOPICS = [("sensors/#", 0), ("test/#", 0)]
+MQTT_TOPICS = [("#", 0)]
 
 
 def on_connect(client, userdata, flags, reason_code, properties=None):
