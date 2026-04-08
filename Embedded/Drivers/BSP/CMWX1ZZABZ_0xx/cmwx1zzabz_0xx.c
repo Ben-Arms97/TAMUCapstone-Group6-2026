@@ -387,11 +387,9 @@ uint32_t CMWX1ZZABZ0XX_RADIO_GetDio1PinState(void)
   * @param  hspi  SPI handler
   * @retval None
 */
-#include "sys_app.h"
 static void CMWX1ZZABZ0XX_RADIO_SPI_IoInit(SPI_HandleTypeDef *spiHandle)
 {
   GPIO_InitTypeDef GPIO_InitStruct;
-  APP_LOG(TS_ON, VLEVEL_L, "SPI_IoInit\r\n");
   /* USER CODE BEGIN SPI1_MspInit 0 */
 
   /* USER CODE END SPI1_MspInit 0 */
