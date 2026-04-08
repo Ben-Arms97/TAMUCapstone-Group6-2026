@@ -59,7 +59,7 @@ extern "C" {
 /**
   * @brief Enable MCU Debugger pins (dbg serial wires, sbg spi, etc)
   */
-#define DEBUGGER_ENABLED            1
+#define DEBUGGER_ENABLED            0
 
 /**
   * @brief Enable four wires usable as probes (two of them PROBE1 and PROBE2 used by the MW)

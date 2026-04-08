@@ -145,15 +145,14 @@ void SysTick_Handler(void)
 #include "sys_app.h"
 void RTC_IRQHandler(void)
 {
-  APP_LOG(TS_ON, VLEVEL_L, "RTC IRQ\r\n");
   HAL_RTC_AlarmIRQHandler(&hrtc);
 }
 
 void EXTI0_1_IRQHandler(void)
 {
   APP_LOG(TS_ON, VLEVEL_L, "EXTI0_1 IRQ\r\n");
-  CMWX1ZZABZ0XX_RADIO_IRQHandler(RADIO_DIO_2);
   CMWX1ZZABZ0XX_RADIO_IRQHandler(RADIO_DIO_1);
+  CMWX1ZZABZ0XX_RADIO_IRQHandler(RADIO_DIO_2);
 }
 
 void EXTI4_15_IRQHandler(void)
