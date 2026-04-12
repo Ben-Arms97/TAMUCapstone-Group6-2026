@@ -66,7 +66,6 @@ extern "C" {
 #define Sx_Board_GetDio1PinState   SX1276MB1MAS_RADIO_GetDio1PinState
 
 #elif CMWX1ZZABZ0XX
-#include "cmwx1zzabz_0xx_conf.h"
 #include "cmwx1zzabz_0xx.h"
 
 #define Sx_Board_IoInit            CMWX1ZZABZ0XX_RADIO_IoInit
@@ -169,7 +168,7 @@ extern "C" {
 #define Sx_Board_SetLedTx          SX1261DVK1BAS_RADIO_BoardSetLedTx
 
 #else
-#include "b-l072z-lrwan1.h"
+#error "include your board here"
 #endif
 
 /* USER CODE BEGIN ET */

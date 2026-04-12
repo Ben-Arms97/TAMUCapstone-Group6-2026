@@ -42,7 +42,7 @@
 /* Includes ------------------------------------------------------------------*/
 
 #include "cmwx1zzabz_0xx.h"
-
+#include "sys_app.h"
 
 #define IRQ_HIGH_PRIORITY  0
 
@@ -151,7 +151,7 @@ void CMWX1ZZABZ0XX_RADIO_SetXO(uint8_t state)
   {
     HAL_GPIO_WritePin(RADIO_TCXO_VCC_PORT, RADIO_TCXO_VCC_PIN, GPIO_PIN_SET);
 
-    HAL_Delay(BOARD_WAKEUP_TIME);   //start up time of TCXO
+    HAL_Delay(BOARD_TCXO_STARTUP_TIME);   //start up time of TCXO
   }
   else
   {
@@ -283,30 +283,40 @@ TxConfig_TypeDef CMWX1ZZABZ0XX_RADIO_GetPaSelect(uint32_t channel)
 
 void CMWX1ZZABZ0XX_RADIO_SetAntSw(RfSw_TypeDef state)
 {
-    /* Always clear all RF switch controls first */
-    HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_RX,       RADIO_ANT_SWITCH_PIN_RX,       GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_TX_RFO,   RADIO_ANT_SWITCH_PIN_TX_RFO,   GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_TX_BOOST, RADIO_ANT_SWITCH_PIN_TX_BOOST, GPIO_PIN_RESET);
-
-    switch (state)
+  switch (state)
+  {
+    case RFSW_RX:
     {
-        case RFSW_RX:
-            HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_RX, RADIO_ANT_SWITCH_PIN_RX, GPIO_PIN_SET);
-            break;
-
-        case RFSW_RFO_LP:
-            HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_TX_RFO, RADIO_ANT_SWITCH_PIN_TX_RFO, GPIO_PIN_SET);
-            break;
-
-        case RFSW_RFO_HP:
-            HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_TX_BOOST, RADIO_ANT_SWITCH_PIN_TX_BOOST, GPIO_PIN_SET);
-            break;
-
-        case RFSW_RFO_LF:
-        case RFSW_OFF:
-        default:
-            break;
+      HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_TX_BOOST, RADIO_ANT_SWITCH_PIN_TX_BOOST, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_TX_RFO, RADIO_ANT_SWITCH_PIN_TX_RFO, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_RX, RADIO_ANT_SWITCH_PIN_RX, GPIO_PIN_SET);
+      break;
     }
+    case RFSW_RFO_LP:
+    {
+      HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_RX, RADIO_ANT_SWITCH_PIN_RX, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_TX_BOOST, RADIO_ANT_SWITCH_PIN_TX_BOOST, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_TX_RFO, RADIO_ANT_SWITCH_PIN_TX_RFO, GPIO_PIN_SET);
+      break;
+    }
+    case RFSW_RFO_HP:
+    {
+      HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_RX, RADIO_ANT_SWITCH_PIN_RX, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_TX_RFO, RADIO_ANT_SWITCH_PIN_TX_RFO, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_TX_BOOST, RADIO_ANT_SWITCH_PIN_TX_BOOST, GPIO_PIN_SET);
+      break;
+    }
+    case RFSW_RFO_LF:
+    {
+      break;
+    }
+    case RFSW_OFF:
+    default:
+      HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_RX, RADIO_ANT_SWITCH_PIN_RX, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_TX_RFO, RADIO_ANT_SWITCH_PIN_TX_RFO, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(RADIO_ANT_SWITCH_PORT_TX_BOOST, RADIO_ANT_SWITCH_PIN_TX_BOOST, GPIO_PIN_RESET);
+      break;
+  }
 }
 
 bool CMWX1ZZABZ0XX_RADIO_CheckRfFrequency(uint32_t frequency)
@@ -317,24 +327,26 @@ bool CMWX1ZZABZ0XX_RADIO_CheckRfFrequency(uint32_t frequency)
 
 void CMWX1ZZABZ0XX_RADIO_Reset(void)
 {
-    GPIO_InitTypeDef initStruct = {0};
+  GPIO_InitTypeDef initStruct = { 0 };
 
-    RADIO_RESET_CLK_ENABLE();
+  initStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  initStruct.Pull = GPIO_NOPULL;
+  initStruct.Speed = GPIO_SPEED_HIGH;
+  initStruct.Pin = RADIO_RESET_PIN;
 
-    initStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    initStruct.Pull = GPIO_NOPULL;
-    initStruct.Speed = GPIO_SPEED_HIGH;
-    initStruct.Pin = RADIO_RESET_PIN;
-    HAL_GPIO_Init(RADIO_RESET_PORT, &initStruct);
+  // Set RESET pin to 0
+  HAL_GPIO_Init(RADIO_RESET_PORT, &initStruct);
+  HAL_GPIO_WritePin(RADIO_RESET_PORT, RADIO_RESET_PIN, GPIO_PIN_RESET);
 
-    HAL_GPIO_WritePin(RADIO_RESET_PORT, RADIO_RESET_PIN, GPIO_PIN_RESET);
-    HAL_Delay(1);
+  // Wait 1 ms
+  HAL_Delay(1);
 
-    initStruct.Mode = GPIO_MODE_INPUT;
-    initStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(RADIO_RESET_PORT, &initStruct);
+  // Configure RESET as input
+  initStruct.Mode = GPIO_NOPULL;
+  HAL_GPIO_Init(RADIO_RESET_PORT, &initStruct);
 
-    HAL_Delay(6);
+  // Wait 6 ms
+  HAL_Delay(6);
 }
 
 /* Bus mapping to SPI */

@@ -151,6 +151,16 @@ void RTC_IRQHandler(void)
 void EXTI0_1_IRQHandler(void)
 {
   APP_LOG(TS_ON, VLEVEL_L, "EXTI0_1 IRQ\r\n");
+
+  char dbg[96];
+  uint32_t state = Sx_Board_GetDio1PinState();
+
+  snprintf(dbg, sizeof(dbg),
+           "DIO1_STATE %lu state=%lu\r\n",
+           (unsigned long)HAL_GetTick(),
+           (unsigned long)state);
+  APP_LOG(TS_ON, VLEVEL_M, dbg);
+
   CMWX1ZZABZ0XX_RADIO_IRQHandler(RADIO_DIO_1);
   CMWX1ZZABZ0XX_RADIO_IRQHandler(RADIO_DIO_2);
 }
