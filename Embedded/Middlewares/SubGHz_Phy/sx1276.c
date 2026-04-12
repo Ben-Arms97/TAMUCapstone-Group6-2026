@@ -51,11 +51,6 @@
 #include "sx1276.h"
 #include "radio_conf.h"
 
-static volatile uint8_t dbg_dio1_pending = 1;
-static volatile uint32_t dbg_dio1_tick = 0;
-static volatile uint8_t dbg_dio1_irq = 0;
-static volatile uint8_t dbg_dio1_stat = 0;
-
 /*!
  * \brief Internal frequency of the radio
  */
@@ -402,16 +397,6 @@ uint32_t SX1276Init( RadioEvents_t *events )
     SX1276SetModem( MODEM_FSK );
 
     SX1276.Settings.State = RF_IDLE;
-
-//    SX1276Debug_ForceDio0Irq();
-#include "sys_app.h"
-    char dbg[96];
-    snprintf(dbg, sizeof(dbg),
-             "INIT %lu sync=0x%02X invIQ=0x%02X\r\n",
-             (unsigned long)HAL_GetTick(),
-             SX1276Read(REG_LR_SYNCWORD),
-             SX1276Read(REG_LR_INVERTIQ));
-    APP_LOG(TS_ON, VLEVEL_M, dbg);
 
     return ( uint32_t )Sx_Board_GetWakeUpTime( ) + RADIO_WAKEUP_TIME;
 }
@@ -880,7 +865,7 @@ uint32_t SX1276GetTimeOnAir( RadioModems_t modem, uint32_t bandwidth,
     // Perform integral ceil()
     return ( numerator + denominator - 1 ) / denominator;
 }
-#include "sys_app.h"
+
 void SX1276Send( uint8_t *buffer, uint8_t size )
 {
     uint32_t txTimeout = 0;
@@ -1235,16 +1220,6 @@ void SX1276SetRx( uint32_t timeout )
         }
         else
         {
-        	char dbg[96];
-        	snprintf(dbg, sizeof(dbg),
-        	         "RXCFG %lu f=%lu dr=%d st=0x%02X sw=0x%02X iq=0x%02X\r\n",
-        	         (unsigned long)HAL_GetTick(),
-        	         (unsigned long)SX1276.Settings.Channel,
-        	         SX1276.Settings.LoRa.Datarate,
-        	         SX1276Read(REG_LR_SYMBTIMEOUTLSB),
-        	         SX1276Read(REG_LR_SYNCWORD),
-        	         SX1276Read(REG_LR_INVERTIQ));
-        	APP_LOG(TS_ON, VLEVEL_M, dbg);
             SX1276SetOpMode( RFLR_OPMODE_RECEIVER_SINGLE );
         }
     }
@@ -1403,35 +1378,31 @@ static void SX1276SetOpMode( uint8_t opMode )
 {
     if( opMode == RF_OPMODE_SLEEP )
     {
-        SX1276Write( REG_OPMODE, ( SX1276Read( REG_OPMODE ) & RF_OPMODE_MASK ) | opMode );
-        Sx_Board_SetAntSw( RFSW_OFF );
-        Sx_Board_SetXO( RESET );
+      SX1276Write( REG_OPMODE, ( SX1276Read( REG_OPMODE ) & RF_OPMODE_MASK ) | opMode );
+      Sx_Board_SetAntSw( RFSW_OFF );
+      Sx_Board_SetXO( RESET ); 
     }
-    else if ( opMode == RF_OPMODE_RECEIVER )
+    else if ( opMode == RF_OPMODE_RECEIVER || opMode == RFLR_OPMODE_RECEIVER_SINGLE )
     {
-        Sx_Board_SetXO( SET );
-        Sx_Board_SetAntSw( RFSW_RX );
-        SX1276Write( REG_OPMODE, ( SX1276Read( REG_OPMODE ) & RF_OPMODE_MASK ) | opMode );
-        APP_LOG(TS_ON, VLEVEL_M, "OpMode set: 0x%02X (Reg=0x%02X)\r\n",
-                opMode,
-                SX1276Read(REG_OPMODE));
+      // Enable TCXO if operating mode different from SLEEP.
+      Sx_Board_SetXO( SET ); 
+      Sx_Board_SetAntSw( RFSW_RX );
+      SX1276Write( REG_OPMODE, ( SX1276Read( REG_OPMODE ) & RF_OPMODE_MASK ) | opMode );
     }
     else
     {
-        uint8_t paConfig = SX1276Read( REG_PACONFIG );
-
-        Sx_Board_SetXO( SET );
-
-        if( ( paConfig & RF_PACONFIG_PASELECT_PABOOST ) == RF_PACONFIG_PASELECT_PABOOST )
-        {
-            Sx_Board_SetAntSw( RFSW_RFO_HP );
-        }
-        else
-        {
-            Sx_Board_SetAntSw( RFSW_RFO_LP );
-        }
-
-        SX1276Write( REG_OPMODE, ( SX1276Read( REG_OPMODE ) & RF_OPMODE_MASK ) | opMode );
+      uint8_t paConfig =  SX1276Read( REG_PACONFIG );
+      // Enable TCXO if operating mode different from SLEEP.
+      Sx_Board_SetXO( SET ); 
+      if( ( paConfig & RF_PACONFIG_PASELECT_PABOOST ) == RF_PACONFIG_PASELECT_PABOOST )
+      {
+        Sx_Board_SetAntSw( RFSW_RFO_HP );
+      }
+      else
+      {
+        Sx_Board_SetAntSw( RFSW_RFO_LP );
+      }
+      SX1276Write( REG_OPMODE, ( SX1276Read( REG_OPMODE ) & RF_OPMODE_MASK ) | opMode );
     }
 }
 
@@ -1464,7 +1435,11 @@ void SX1276SetModem( RadioModems_t modem )
         break;
     case MODEM_LORA:
         SX1276SetOpMode( RF_OPMODE_SLEEP );
-        SX1276Write( REG_OPMODE, ( SX1276Read( REG_OPMODE ) & RFLR_OPMODE_LONGRANGEMODE_MASK ) | RFLR_OPMODE_LONGRANGEMODE_ON );
+        /* Clear bit 7 (LongRangeMode) AND bit 3 (LowFrequencyModeOn) before
+         * setting LoRa mode.  The POR default has LowFrequencyModeOn=1 (LF
+         * signal chain), which must be cleared for HF bands (868/915 MHz).
+         * Both bits can only be written in Sleep mode. */
+        SX1276Write( REG_OPMODE, ( SX1276Read( REG_OPMODE ) & RFLR_OPMODE_LONGRANGEMODE_MASK & 0xF7 ) | RFLR_OPMODE_LONGRANGEMODE_ON );
 
         SX1276Write( REG_DIOMAPPING1, 0x00 );
         SX1276Write( REG_DIOMAPPING2, 0x00 );
@@ -1789,12 +1764,10 @@ static void SX1276OnTimeoutIrq( void* context )
         break;
     }
 }
-#include "sys_app.h"
+
 static void SX1276OnDio0Irq( void )
 {
     volatile uint8_t irqFlags = 0;
-    char dbg[96];
-    uint8_t irq = SX1276Read(REG_LR_IRQFLAGS);
 
     switch( SX1276.Settings.State )
     {
@@ -1957,11 +1930,6 @@ static void SX1276OnDio0Irq( void )
             break;
         case RF_TX_RUNNING:
             TimerStop( &TxTimeoutTimer );
-
-            char dbg[64];
-            snprintf(dbg, sizeof(dbg), "TX_DONE at %lu ms\r\n", HAL_GetTick());
-            APP_LOG(TS_ON, VLEVEL_M, dbg);
-
             // TxDone interrupt
             switch( SX1276.Settings.Modem )
             {
@@ -1986,16 +1954,6 @@ static void SX1276OnDio0Irq( void )
 
 static void SX1276OnDio1Irq( void )
 {
-	char dbg[96];
-	dbg_dio1_tick = HAL_GetTick();
-	dbg_dio1_irq  = SX1276Read(REG_LR_IRQFLAGS);
-	dbg_dio1_stat = SX1276Read(REG_LR_MODEMSTAT);
-	snprintf(dbg, sizeof(dbg),
-			 "DIO1D %lu irq=0x%02X stat=0x%02X\r\n",
-			 (unsigned long)dbg_dio1_tick,
-			 dbg_dio1_irq,
-			 dbg_dio1_stat);
-	APP_LOG(TS_ON, VLEVEL_M, dbg);
     switch( SX1276.Settings.State )
     {
         case RF_RX_RUNNING:
@@ -2231,20 +2189,4 @@ static void SX1276OnDio4Irq( void )
     }
 }
 
-void SX1276Debug_ForceDio0Irq(void)
-{
-    APP_LOG(TS_ON, VLEVEL_M, "DEBUG: forcing DIO0 IRQ path\r\n");
-    SX1276.Settings.State = RF_RX_RUNNING;
-    SX1276.Settings.Modem = MODEM_LORA;
-    SX1276OnDio0Irq();
-}
-
-void SX1276Debug_ForceDio1Irq(void)
-{
-    APP_LOG(TS_ON, VLEVEL_M, "DEBUG: forcing DIO1 IRQ path\r\n");
-    SX1276.Settings.State = RF_RX_RUNNING;
-    SX1276.Settings.Modem = MODEM_LORA;
-    SX1276Write(REG_LR_IRQFLAGS, RFLR_IRQFLAGS_RXTIMEOUT);
-    SX1276OnDio1Irq();
-}
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

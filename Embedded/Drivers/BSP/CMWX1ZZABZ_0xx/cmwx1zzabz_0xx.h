@@ -92,7 +92,8 @@ typedef void (DioIrqHandler)(void);
 
 /* Exported constants --------------------------------------------------------*/
 
-#define BOARD_WAKEUP_TIME  5 //TCXO
+#define BOARD_TCXO_STARTUP_TIME  5   // Actual TCXO oscillator startup (ms)
+#define BOARD_WAKEUP_TIME      250  // MAC timing compensation: TCXO + processing overhead at 2.097MHz MSI
 
 /* Exported variables------------------------------------------------------- */
 extern EXTI_HandleTypeDef hRADIO_DIO_exti[RADIO_DIOn];
@@ -189,8 +190,6 @@ void CMWX1ZZABZ0XX_RADIO_Bus_Init(void);
  * \brief SPI Bus Deinit
  */
 void CMWX1ZZABZ0XX_RADIO_Bus_deInit(void);
-
-void CMWX1ZZABZ0XX_RADIO_IRQHandler(RADIO_DIO_TypeDef DIO);
 
 #ifdef __cplusplus
 }

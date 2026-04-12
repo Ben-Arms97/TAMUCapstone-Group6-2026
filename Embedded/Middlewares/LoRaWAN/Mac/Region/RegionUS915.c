@@ -43,6 +43,8 @@
 #include "RegionUS915.h"
 #include "RegionBaseUS.h"
 #include "lorawan_conf.h"  /* REGION_* */
+#include "sys_app.h"
+#include "sx1276.h"
 
 // Definitions
 #define CHANNELS_MASK_SIZE              6
@@ -584,7 +586,7 @@ bool RegionUS915RxConfig( RxConfigParams_t* rxConfig, int8_t* datarate )
     Radio.SetChannel( frequency );
 
     // Radio configuration
-    Radio.SetRxConfig( MODEM_LORA, rxConfig->Bandwidth, phyDr, 1, 0, 8, rxConfig->WindowTimeout, false, 0, false, 0, 0, true, rxConfig->RxContinuous );
+    Radio.SetRxConfig( MODEM_LORA, rxConfig->Bandwidth, phyDr, 1, 0, 8, 250/*rxConfig->WindowTimeout*/, false, 0, false, 0, 0, true, rxConfig->RxContinuous );
 
     /* ST_WORKAROUND_BEGIN: Keep repeater feature */
     if( rxConfig->RepeaterSupport == true )
