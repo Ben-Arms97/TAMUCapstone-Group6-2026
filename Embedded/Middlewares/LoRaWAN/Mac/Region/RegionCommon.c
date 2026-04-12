@@ -686,16 +686,11 @@ uint32_t RegionCommonGetBandwidth( uint32_t drIndex, const uint32_t* bandwidths 
 /* ST_WORKAROUND_BEGIN: Print Tx/Rx config */
 void RegionCommonRxConfigPrint(LoRaMacRxSlot_t rxSlot, uint32_t frequency, int8_t dr)
 {
-    const char *slotStrings[] = { "1", "2", "C", "Multi_C", "P", "Multi_P" };
-
-    if ( rxSlot < RX_SLOT_NONE )
-    {
-        MW_LOG(TS_ON, VLEVEL_M,  "RX_%s on freq %d Hz at DR %d\r\n", slotStrings[rxSlot], frequency, dr );
-    }
-    else
-    {
-        MW_LOG(TS_ON, VLEVEL_M,  "RX on freq %d Hz at DR %d\r\n", frequency, dr );
-    }
+    /* Logging removed: UART output at 2.097MHz MSI adds ~30ms delay
+     * in the critical RX window setup path, causing missed downlinks. */
+    (void)rxSlot;
+    (void)frequency;
+    (void)dr;
 }
 
 void RegionCommonTxConfigPrint(uint32_t frequency, int8_t dr)

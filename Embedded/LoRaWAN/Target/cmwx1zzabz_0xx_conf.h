@@ -25,6 +25,7 @@ extern "C" {
 #endif
 
 #include "platform.h"
+#include "radio_conf.h"
 
 /* Defines ---------------------------------------------------------------*/
 #define RADIO_DIO_0_IT_PRIO                        0
@@ -34,34 +35,28 @@ extern "C" {
 
 /* Daughter board Pin mapping --------------------------------------------*/
 
-/* SPI functions redefinition */
-#define RADIO_SPI_Init                   BSP_SPI2_Init
-#define RADIO_SPI_DeInit                 BSP_SPI2_DeInit
-#define RADIO_SPI_SendRecv               BSP_SPI2_SendRecv
+/*  SPI functions redefinition */
+#define RADIO_SPI_Init                   BSP_SPI1_Init
+#define RADIO_SPI_DeInit                 BSP_SPI1_DeInit
+#define RADIO_SPI_SendRecv               BSP_SPI1_SendRecv
 
-#define RADIO_SPI_SCK_GPIO_PIN           BUS_SPI2_SCK_GPIO_PIN
-#define RADIO_SPI_MISO_GPIO_PIN          BUS_SPI2_MISO_GPIO_PIN
-#define RADIO_SPI_MOSI_GPIO_PIN          BUS_SPI2_MOSI_GPIO_PIN
-#define RADIO_SPI_SCK_GPIO_PORT          BUS_SPI2_SCK_GPIO_PORT
-#define RADIO_SPI_MISO_GPIO_PORT         BUS_SPI2_MISO_GPIO_PORT
-#define RADIO_SPI_MOSI_GPIO_PORT         BUS_SPI2_MOSI_GPIO_PORT
-#define RADIO_SPI_SCK_GPIO_AF            BUS_SPI2_SCK_GPIO_AF
-#define RADIO_SPI_MOSI_GPIO_AF           BUS_SPI2_MOSI_GPIO_AF
-#define RADIO_SPI_MISO_GPIO_AF           BUS_SPI2_MISO_GPIO_AF
-#define RADIO_SPI_SCK_GPIO_CLK_ENABLE()  BUS_SPI2_SCK_GPIO_CLK_ENABLE()
-#define RADIO_SPI_MOSI_GPIO_CLK_ENABLE() BUS_SPI2_MOSI_GPIO_CLK_ENABLE()
-#define RADIO_SPI_MISO_GPIO_CLK_ENABLE() BUS_SPI2_MISO_GPIO_CLK_ENABLE()
+#define RADIO_SPI_SCK_GPIO_PIN           BUS_SPI1_SCK_GPIO_PIN
+#define RADIO_SPI_MISO_GPIO_PIN          BUS_SPI1_MISO_GPIO_PIN
+#define RADIO_SPI_MOSI_GPIO_PIN          BUS_SPI1_MOSI_GPIO_PIN
+#define RADIO_SPI_SCK_GPIO_PORT          BUS_SPI1_SCK_GPIO_PORT
+#define RADIO_SPI_MISO_GPIO_PORT         BUS_SPI1_MISO_GPIO_PORT
+#define RADIO_SPI_MOSI_GPIO_PORT         BUS_SPI1_MOSI_GPIO_PORT
+#define RADIO_SPI_SCK_GPIO_AF            BUS_SPI1_SCK_GPIO_AF
+#define RADIO_SPI_MOSI_GPIO_AF           BUS_SPI1_MOSI_GPIO_AF
+#define RADIO_SPI_MISO_GPIO_AF           BUS_SPI1_MISO_GPIO_AF
+#define RADIO_SPI_SCK_GPIO_CLK_ENABLE()  BUS_SPI1_SCK_GPIO_CLK_ENABLE()
+#define RADIO_SPI_MOSI_GPIO_CLK_ENABLE() BUS_SPI1_MOSI_GPIO_CLK_ENABLE()
+#define RADIO_SPI_MISO_GPIO_CLK_ENABLE() BUS_SPI1_MISO_GPIO_CLK_ENABLE()
 
-/* SPIx Bus Pin mapping
- * Custom board:
- *   PB12 = NSS  (software-controlled GPIO)
- *   PB13 = SPI2_SCK
- *   PB14 = SPI2_MISO
- *   PB15 = SPI2_MOSI
- */
-#define RADIO_NSS_CLK_ENABLE()      __HAL_RCC_GPIOB_CLK_ENABLE()
-#define RADIO_NSS_PORT              GPIOB
-#define RADIO_NSS_PIN               GPIO_PIN_12
+/* SPIx Bus Pin mapping */
+#define RADIO_NSS_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE()
+#define RADIO_NSS_PORT              GPIOA
+#define RADIO_NSS_PIN               GPIO_PIN_15
 
 /* LORA I/O pin mapping */
 #define RADIO_RESET_CLK_ENABLE()    __HAL_RCC_GPIOC_CLK_ENABLE()
@@ -113,8 +108,6 @@ extern "C" {
 #define RADIO_ANT_SWITCH_CLK_ENABLE_TX_RFO()      __HAL_RCC_GPIOC_CLK_ENABLE()
 #define RADIO_ANT_SWITCH_PORT_TX_RFO       GPIOC
 #define RADIO_ANT_SWITCH_PIN_TX_RFO        GPIO_PIN_2
-
-#include "radio_conf.h"
 
 #ifdef __cplusplus
 }

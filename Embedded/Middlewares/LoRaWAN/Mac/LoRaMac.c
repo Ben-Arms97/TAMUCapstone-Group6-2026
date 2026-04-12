@@ -55,6 +55,7 @@
 #include "LoRaMacAdr.h"
 #include "LoRaMacSerializer.h"
 #include "radio.h"
+#include "sys_app.h"
 
 #include "LoRaMac.h"
 #include "mw_log_conf.h"

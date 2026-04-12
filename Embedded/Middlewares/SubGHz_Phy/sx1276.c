@@ -1379,18 +1379,14 @@ static void SX1276SetOpMode( uint8_t opMode )
     if( opMode == RF_OPMODE_SLEEP )
     {
       SX1276Write( REG_OPMODE, ( SX1276Read( REG_OPMODE ) & RF_OPMODE_MASK ) | opMode );
-
       Sx_Board_SetAntSw( RFSW_OFF );
-      
       Sx_Board_SetXO( RESET ); 
     }
-    else if ( opMode == RF_OPMODE_RECEIVER )
+    else if ( opMode == RF_OPMODE_RECEIVER || opMode == RFLR_OPMODE_RECEIVER_SINGLE )
     {
       // Enable TCXO if operating mode different from SLEEP.
       Sx_Board_SetXO( SET ); 
-      
       Sx_Board_SetAntSw( RFSW_RX );
-      
       SX1276Write( REG_OPMODE, ( SX1276Read( REG_OPMODE ) & RF_OPMODE_MASK ) | opMode );
     }
     else
@@ -1398,7 +1394,6 @@ static void SX1276SetOpMode( uint8_t opMode )
       uint8_t paConfig =  SX1276Read( REG_PACONFIG );
       // Enable TCXO if operating mode different from SLEEP.
       Sx_Board_SetXO( SET ); 
-
       if( ( paConfig & RF_PACONFIG_PASELECT_PABOOST ) == RF_PACONFIG_PASELECT_PABOOST )
       {
         Sx_Board_SetAntSw( RFSW_RFO_HP );
@@ -1407,7 +1402,6 @@ static void SX1276SetOpMode( uint8_t opMode )
       {
         Sx_Board_SetAntSw( RFSW_RFO_LP );
       }
-      
       SX1276Write( REG_OPMODE, ( SX1276Read( REG_OPMODE ) & RF_OPMODE_MASK ) | opMode );
     }
 }
@@ -1441,7 +1435,11 @@ void SX1276SetModem( RadioModems_t modem )
         break;
     case MODEM_LORA:
         SX1276SetOpMode( RF_OPMODE_SLEEP );
-        SX1276Write( REG_OPMODE, ( SX1276Read( REG_OPMODE ) & RFLR_OPMODE_LONGRANGEMODE_MASK ) | RFLR_OPMODE_LONGRANGEMODE_ON );
+        /* Clear bit 7 (LongRangeMode) AND bit 3 (LowFrequencyModeOn) before
+         * setting LoRa mode.  The POR default has LowFrequencyModeOn=1 (LF
+         * signal chain), which must be cleared for HF bands (868/915 MHz).
+         * Both bits can only be written in Sleep mode. */
+        SX1276Write( REG_OPMODE, ( SX1276Read( REG_OPMODE ) & RFLR_OPMODE_LONGRANGEMODE_MASK & 0xF7 ) | RFLR_OPMODE_LONGRANGEMODE_ON );
 
         SX1276Write( REG_DIOMAPPING1, 0x00 );
         SX1276Write( REG_DIOMAPPING2, 0x00 );

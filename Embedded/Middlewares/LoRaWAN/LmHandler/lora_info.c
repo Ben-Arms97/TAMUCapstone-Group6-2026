@@ -20,9 +20,10 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-#include <lora_info.h>
 #include "LoRaMac.h"
+#include "lora_info.h"
 #include "sys_app.h" /* APP_PRINTF */
+#include "lorawan_conf.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -109,12 +110,14 @@ void LoraInfo_Init(void)
 
   if (loraInfo.Region == 0)
   {
-    APP_PRINTF("error: At least one region shall be defined in the MW: check lorawan_conf.h \r\n");
-    while (1 != UTIL_ADV_TRACE_IsBufferEmpty())
+    //APP_PRINTF("error: At least one region shall be defined in the MW: check lorawan_conf.h \r\n");
+#if 0
+	while (1 != UTIL_ADV_TRACE_IsBufferEmpty())
     {
       /* Wait that all printfs are completed*/
     }
     while (1) {} /* At least one region shall be defined */
+#endif
   }
 
 #if ( LORAMAC_CLASSB_ENABLED == 1 )

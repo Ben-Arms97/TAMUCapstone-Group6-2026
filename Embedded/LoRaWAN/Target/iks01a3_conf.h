@@ -17,9 +17,9 @@
   ******************************************************************************
   */
 
-#include "stm32l4xx_hal.h"
-#include "nucleo_l476rg_bus.h"
-#include "nucleo_l476rg_errno.h"
+#include "stm32l0xx_hal.h"
+#include "b_l072z_lrwan1_bus.h"
+#include "b_l072z_lrwan1_errno.h"
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __IKS01A3_CONF_H__
