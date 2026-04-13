@@ -145,10 +145,11 @@ int main(void)
     float sin = adc_values[0]/4096.0f - 0.5;
     float cos = adc_values[1]/4096.0f - 0.5;
 
-	float angle = atan2(sin, cos) * 180/M_PI; //- init
+	//float angle = atan2(sin, cos) * 180/M_PI; //- init
 
+	snprintf(msg, sizeof(msg), "sin=%f cos=%f\r\n", sin, cos);
 	APP_LOG(TS_ON, VLEVEL_L, msg);
-	MX_LoRaWAN_Process();
+	//MX_LoRaWAN_Process();
 
 	HAL_Delay(5000);
   }

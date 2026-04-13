@@ -25,7 +25,6 @@
 #include "app_lorawan.h"
 #include "adc.h"
 #include "usart.h"
-#include "sys_app.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -112,7 +111,6 @@ int main(void)
   MX_ADC_Init();
   MX_USART1_UART_Init();
   //MX_I2C1_Init();
-  BSP_I2C1_Init();
   /* USER CODE BEGIN 2 */
   (void)HAL_ADC_Start(&hadc);
 
@@ -126,7 +124,7 @@ int main(void)
 		if (HAL_I2C_IsDeviceReady(&hi2c1, addr << 1, 1, 10) == HAL_OK)
 		{
 			snprintf(msg, sizeof(msg), "Device found at 0x%02X\r\n", addr);
-			APP_LOG(TS_ON, VLEVEL_L, msg);
+			HAL_UART_Transmit(&huart1, (uint8_t *)msg, (uint16_t)strlen(msg), HAL_MAX_DELAY);
 		}
 	}
 //
@@ -147,10 +145,10 @@ int main(void)
 
 	float angle = atan2(sin, cos) * 180/M_PI; //- init
 
-	APP_LOG(TS_ON, VLEVEL_L, msg);
-	MX_LoRaWAN_Process();
+	snprintf(msg, sizeof(msg), "sin=%f cos=%f, angle=%f\r\n", sin, cos, angle);
+	//MX_LoRaWAN_Process();
 
-	HAL_Delay(5000);
+
   }
   /* USER CODE END 3 */
 }

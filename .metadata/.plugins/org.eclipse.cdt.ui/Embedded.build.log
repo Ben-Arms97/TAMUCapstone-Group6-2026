@@ -1,0 +1,92 @@
+14:45:03 **** Incremental Build of configuration Debug for project Embedded ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m0plus -std=gnu11 -g3 -DDEBUG -DCMWX1ZZABZ0XX -DUSE_HAL_DRIVER -DSTM32L082xx -c -I../Core/Inc -I../Middlewares/SubGHz_Phy/ -I../Middlewares/LoRaWAN/Mac/Region -I../Drivers/BSP/CMWX1ZZABZ_0xx/ -I../Drivers/BSP/B-L072Z-LRWAN1 -I../Middlewares/LoRaWAN/Mac -I../Middlewares/LoRaWAN/Crypto -I../Middlewares/LoRaWAN/LmHandler -I../Middlewares/LoRaWAN/LmHandler/Packages -I../Middlewares/LoRaWAN/Utilities -I../LoRaWAN/App -I../LoRaWAN/Target -I../Drivers/STM32L0xx_HAL_Driver/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L0xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+In file included from ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rtc.h:713,
+                 from ../Core/Inc/stm32l0xx_hal_conf.h:264,
+                 from ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rtc_ex.h:155: warning: "RTC_TAMPER1_INTERRUPT" redefined
+  155 | #define RTC_TAMPER1_INTERRUPT                RTC_TAMPCR_TAMP1IE
+      | 
+In file included from ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_def.h:30,
+                 from ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rcc.h:27,
+                 from ../Core/Inc/stm32l0xx_hal_conf.h:188:
+../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h:1317: note: this is the location of the previous definition
+ 1317 | #define RTC_TAMPER1_INTERRUPT      RTC_IT_TAMP1
+      | 
+../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rtc_ex.h:159: warning: "RTC_TAMPER2_INTERRUPT" redefined
+  159 | #define RTC_TAMPER2_INTERRUPT                RTC_TAMPCR_TAMP2IE
+      | 
+../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h:1318: note: this is the location of the previous definition
+ 1318 | #define RTC_TAMPER2_INTERRUPT      RTC_IT_TAMP2
+      | 
+../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rtc_ex.h:162: warning: "RTC_TAMPER3_INTERRUPT" redefined
+  162 | #define RTC_TAMPER3_INTERRUPT                RTC_TAMPCR_TAMP3IE
+      | 
+../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h:1319: note: this is the location of the previous definition
+ 1319 | #define RTC_TAMPER3_INTERRUPT      RTC_IT_TAMP3
+      | 
+../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rtc_ex.h:164: warning: "RTC_ALL_TAMPER_INTERRUPT" redefined
+  164 | #define RTC_ALL_TAMPER_INTERRUPT             RTC_TAMPCR_TAMPIE
+      | 
+../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h:1320: note: this is the location of the previous definition
+ 1320 | #define RTC_ALL_TAMPER_INTERRUPT   RTC_IT_TAMP
+      | 
+../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rtc_ex.h:769: warning: "__HAL_RTC_TAMPER_GET_IT" redefined
+  769 | #define __HAL_RTC_TAMPER_GET_IT(__HANDLE__, __INTERRUPT__)    (((__INTERRUPT__) == RTC_IT_TAMP1) ? (((((__HANDLE__)->Instance->ISR) & ((__INTERRUPT__)>> 3U)) != 0U) ? 1U : 0U) : \
+      | 
+../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h:3993: note: this is the location of the previous definition
+ 3993 | #define __HAL_RTC_TAMPER_GET_IT                   __HAL_RTC_TAMPER_GET_FLAG
+      | 
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:97:3: warning: implicit declaration of function 'RTC_IF_Init'; did you mean 'RTC_ISR_INIT'? [-Wimplicit-function-declaration]
+   97 |   RTC_IF_Init();
+      |   ^~~~~~~~~~~
+      |   RTC_ISR_INIT
+../Core/Src/main.c:121:3: warning: implicit declaration of function 'LIS2MDL_Init'; did you mean 'LIS2MDL_ADDR'? [-Wimplicit-function-declaration]
+  121 |   LIS2MDL_Init();
+      |   ^~~~~~~~~~~~
+      |   LIS2MDL_ADDR
+../Core/Src/main.c:142:5: warning: implicit declaration of function 'Read_Angle_Sensor'; did you mean 'Read_Sensor'? [-Wimplicit-function-declaration]
+  142 |     Read_Angle_Sensor();
+      |     ^~~~~~~~~~~~~~~~~
+      |     Read_Sensor
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:277:6: warning: conflicting types for 'LIS2MDL_Init'; have 'void(void)'
+  277 | void LIS2MDL_Init(void)
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:121:3: note: previous implicit declaration of 'LIS2MDL_Init' with type 'void(void)'
+  121 |   LIS2MDL_Init();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:320:6: warning: conflicting types for 'Read_Angle_Sensor'; have 'void()'
+  320 | void Read_Angle_Sensor(){
+      |      ^~~~~~~~~~~~~~~~~
+../Core/Src/main.c:142:5: note: previous implicit declaration of 'Read_Angle_Sensor' with type 'void()'
+  142 |     Read_Angle_Sensor();
+      |     ^~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'detect_touch':
+../Core/Src/main.c:347:44: warning: too many arguments for format [-Wformat-extra-args]
+  347 |                 snprintf(msg, sizeof(msg), "Error: no ACK\r\n", flags);
+      |                                            ^~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:64:13: warning: 'MX_GPIO_Init' declared 'static' but never defined [-Wunused-function]
+   64 | static void MX_GPIO_Init(void);
+      |             ^~~~~~~~~~~~
+../Core/Src/main.c:73:13: warning: 'uart_print' defined but not used [-Wunused-function]
+   73 | static void uart_print(const char *s)
+      |             ^~~~~~~~~~
+arm-none-eabi-gcc -o "Embedded.elf" @"objects.list"   -mcpu=cortex-m0plus -T"C:\Users\Benho\Projects\TAMUCapstone-Group6-2026\Embedded\STM32L082CZYX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Embedded.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: Embedded.elf
+ 
+arm-none-eabi-size  Embedded.elf 
+arm-none-eabi-objdump -h -S Embedded.elf  > "Embedded.list"
+   text	   data	    bss	    dec	    hex	filename
+ 114144	    372	   8356	 122872	  1dff8	Embedded.elf
+Finished building: default.size.stdout
+ 
+Finished building: Embedded.list
+ 
+
+14:45:06 Build Finished. 0 errors, 13 warnings. (took 3s.139ms)
+
