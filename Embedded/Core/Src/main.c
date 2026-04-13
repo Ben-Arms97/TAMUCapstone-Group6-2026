@@ -68,7 +68,6 @@ static void MX_GPIO_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint16_t adc_values[2];
 
 static void uart_print(const char *s)
 {
@@ -84,7 +83,6 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-  char msg[64];
 
   /* USER CODE END 1 */
 
@@ -108,49 +106,32 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_ADC_Init();
   MX_USART1_UART_Init();
-  //MX_GPIO_Init();
   MX_ADC_Init();
   MX_USART1_UART_Init();
-  //MX_I2C1_Init();
   BSP_I2C1_Init();
   /* USER CODE BEGIN 2 */
   (void)HAL_ADC_Start(&hadc);
 
 
   /* USER CODE END 2 */
-  LIS2MDL_Init();
-  HAL_Delay(1000);
-
-  for (uint16_t addr = 1; addr < 128; addr++)
-	{
-		if (HAL_I2C_IsDeviceReady(&hi2c1, addr << 1, 1, 10) == HAL_OK)
-		{
-			snprintf(msg, sizeof(msg), "Device found at 0x%02X\r\n", addr);
-			APP_LOG(TS_ON, VLEVEL_L, msg);
-		}
-	}
+//  HAL_Delay(1000);
 //
-//  uint8_t v = SX1276_ReadReg(0x42);
-//  APP_LOG(TS_ON, VLEVEL_L, "SX1276 Reg 0x42=0x%02X\r\n", v);
-  /* Infinite loop */
+//  char msg[64];
+//  for (uint16_t addr = 1; addr < 128; addr++)
+//	{
+//		if (HAL_I2C_IsDeviceReady(&hi2c1, addr << 1, 1, 10) == HAL_OK)
+//		{
+//			snprintf(msg, sizeof(msg), "Device found at 0x%02X\r\n", addr);
+//			APP_LOG(TS_ON, VLEVEL_L, msg);
+//		}
+//	}
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    Read_Angle_Sensor();
-
-    // Angle Calculation
-    float sin = adc_values[0]/4096.0f - 0.5;
-    float cos = adc_values[1]/4096.0f - 0.5;
-
-	float angle = atan2(sin, cos) * 180/M_PI; //- init
-
-	APP_LOG(TS_ON, VLEVEL_L, msg);
 	MX_LoRaWAN_Process();
-
-	HAL_Delay(5000);
   }
   /* USER CODE END 3 */
 }
@@ -316,13 +297,29 @@ uint32_t read_adc_channel(uint32_t channel)
     return val;
 }
 
-void Read_Angle_Sensor(){
+float Read_Angle_Sensor(){
+	uint16_t adc_values[2];
 
     // Channel 2
 	adc_values[0] = (uint32_t)read_adc_channel(ADC_CHANNEL_2);
-
 	// Channel 3
-	adc_values[1] = (uint32_t)read_adc_channel(ADC_CHANNEL_2);
+	adc_values[1] = (uint32_t)read_adc_channel(ADC_CHANNEL_3);
+
+	char msg[64];
+	snprintf(msg, sizeof(msg), "adc0=%d adc1=%d\r\n", adc_values[0], adc_values[1]);
+	APP_LOG(TS_ON, VLEVEL_L, msg);
+
+	// Angle Calculation
+//	float sin = adc_values[0] - 2048.0f;
+//	float cos = adc_values[1] - 2048.0f;
+	int sin = adc_values[0] - 2048;
+	int cos = adc_values[1] - 2048;
+	snprintf(msg, sizeof(msg), "sin=%d cos=%d\r\n", sin, cos);
+	APP_LOG(TS_ON, VLEVEL_L, msg);
+
+	float angle = atan2(sin, cos) * 180/M_PI + 180;
+
+	return angle;
 }
 
 uint8_t detect_touch(){
