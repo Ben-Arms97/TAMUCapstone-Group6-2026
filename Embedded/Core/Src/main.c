@@ -56,6 +56,8 @@ static void uart_print(const char *s);
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
+uint32_t adc_vals_prev [2];
+Angle_Return angle_reading;
 
 /* USER CODE END PV */
 
@@ -112,6 +114,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   (void)HAL_ADC_Start(&hadc);
 
+  int temp = 0;
+
 
   /* USER CODE END 2 */
 //  HAL_Delay(1000);
@@ -131,7 +135,14 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	MX_LoRaWAN_Process();
+	  if(temp < 10 || angle_reading.changed == 1){
+		  MX_LoRaWAN_Process();
+	  }
+	  if(temp > 10){
+		  Read_Angle_Sensor();
+		  HAL_Delay(10000);
+	  }
+	  temp++;
   }
   /* USER CODE END 3 */
 }
@@ -297,7 +308,7 @@ uint32_t read_adc_channel(uint32_t channel)
     return val;
 }
 
-float Read_Angle_Sensor(){
+void Read_Angle_Sensor(){
 	uint16_t adc_values[2];
 
     // Channel 2
@@ -309,17 +320,31 @@ float Read_Angle_Sensor(){
 	snprintf(msg, sizeof(msg), "adc0=%d adc1=%d\r\n", adc_values[0], adc_values[1]);
 	APP_LOG(TS_ON, VLEVEL_L, msg);
 
+    // if doesn't pass thresholds
+    if(adc_values[0] < adc_vals_prev[0] + 50 && adc_values[0] > adc_vals_prev[0] - 50 && adc_values[1] < adc_vals_prev[1] + 50 && adc_values[1] > adc_vals_prev[1] - 50){
+    	angle_reading.angle_val = 0;
+        angle_reading.changed = 0;
+        return;
+    }
+
 	// Angle Calculation
-//	float sin = adc_values[0] - 2048.0f;
-//	float cos = adc_values[1] - 2048.0f;
 	int sin = adc_values[0] - 2048;
 	int cos = adc_values[1] - 2048;
-	snprintf(msg, sizeof(msg), "sin=%d cos=%d\r\n", sin, cos);
-	APP_LOG(TS_ON, VLEVEL_L, msg);
+//	snprintf(msg, sizeof(msg), "sin=%d cos=%d\r\n", sin, cos);
+//	APP_LOG(TS_ON, VLEVEL_L, msg);
 
 	float angle = atan2(sin, cos) * 180/M_PI + 180;
 
-	return angle;
+	snprintf(msg, sizeof(msg), "angle=%d\r\n", sin, cos);
+	APP_LOG(TS_ON, VLEVEL_L, msg);
+
+	angle_reading.angle_val = angle;
+	angle_reading.changed = 1;
+
+	adc_vals_prev[0] = adc_values[0];
+	adc_vals_prev[1] = adc_values[1];
+
+	return;
 }
 
 uint8_t detect_touch(){

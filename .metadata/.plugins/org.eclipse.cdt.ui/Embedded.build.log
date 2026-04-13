@@ -1,4 +1,4 @@
-14:45:03 **** Incremental Build of configuration Debug for project Embedded ****
+17:18:21 **** Incremental Build of configuration Debug for project Embedded ****
 make -j16 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m0plus -std=gnu11 -g3 -DDEBUG -DCMWX1ZZABZ0XX -DUSE_HAL_DRIVER -DSTM32L082xx -c -I../Core/Inc -I../Middlewares/SubGHz_Phy/ -I../Middlewares/LoRaWAN/Mac/Region -I../Drivers/BSP/CMWX1ZZABZ_0xx/ -I../Drivers/BSP/B-L072Z-LRWAN1 -I../Middlewares/LoRaWAN/Mac -I../Middlewares/LoRaWAN/Crypto -I../Middlewares/LoRaWAN/LmHandler -I../Middlewares/LoRaWAN/LmHandler/Packages -I../Middlewares/LoRaWAN/Utilities -I../LoRaWAN/App -I../LoRaWAN/Target -I../Drivers/STM32L0xx_HAL_Driver/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L0xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
 In file included from ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rtc.h:713,
@@ -44,37 +44,20 @@ In file included from ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_def.h:30
    97 |   RTC_IF_Init();
       |   ^~~~~~~~~~~
       |   RTC_ISR_INIT
-../Core/Src/main.c:121:3: warning: implicit declaration of function 'LIS2MDL_Init'; did you mean 'LIS2MDL_ADDR'? [-Wimplicit-function-declaration]
-  121 |   LIS2MDL_Init();
-      |   ^~~~~~~~~~~~
-      |   LIS2MDL_ADDR
-../Core/Src/main.c:142:5: warning: implicit declaration of function 'Read_Angle_Sensor'; did you mean 'Read_Sensor'? [-Wimplicit-function-declaration]
-  142 |     Read_Angle_Sensor();
-      |     ^~~~~~~~~~~~~~~~~
-      |     Read_Sensor
-../Core/Src/main.c: At top level:
-../Core/Src/main.c:277:6: warning: conflicting types for 'LIS2MDL_Init'; have 'void(void)'
-  277 | void LIS2MDL_Init(void)
-      |      ^~~~~~~~~~~~
-../Core/Src/main.c:121:3: note: previous implicit declaration of 'LIS2MDL_Init' with type 'void(void)'
-  121 |   LIS2MDL_Init();
-      |   ^~~~~~~~~~~~
-../Core/Src/main.c:320:6: warning: conflicting types for 'Read_Angle_Sensor'; have 'void()'
-  320 | void Read_Angle_Sensor(){
-      |      ^~~~~~~~~~~~~~~~~
-../Core/Src/main.c:142:5: note: previous implicit declaration of 'Read_Angle_Sensor' with type 'void()'
-  142 |     Read_Angle_Sensor();
-      |     ^~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'Read_Angle_Sensor':
+../Core/Src/main.c:338:36: warning: too many arguments for format [-Wformat-extra-args]
+  338 |         snprintf(msg, sizeof(msg), "angle=%d\r\n", sin, cos);
+      |                                    ^~~~~~~~~~~~~~
 ../Core/Src/main.c: In function 'detect_touch':
-../Core/Src/main.c:347:44: warning: too many arguments for format [-Wformat-extra-args]
-  347 |                 snprintf(msg, sizeof(msg), "Error: no ACK\r\n", flags);
+../Core/Src/main.c:368:44: warning: too many arguments for format [-Wformat-extra-args]
+  368 |                 snprintf(msg, sizeof(msg), "Error: no ACK\r\n", flags);
       |                                            ^~~~~~~~~~~~~~~~~~~
 ../Core/Src/main.c: At top level:
-../Core/Src/main.c:64:13: warning: 'MX_GPIO_Init' declared 'static' but never defined [-Wunused-function]
-   64 | static void MX_GPIO_Init(void);
+../Core/Src/main.c:66:13: warning: 'MX_GPIO_Init' declared 'static' but never defined [-Wunused-function]
+   66 | static void MX_GPIO_Init(void);
       |             ^~~~~~~~~~~~
-../Core/Src/main.c:73:13: warning: 'uart_print' defined but not used [-Wunused-function]
-   73 | static void uart_print(const char *s)
+../Core/Src/main.c:74:13: warning: 'uart_print' defined but not used [-Wunused-function]
+   74 | static void uart_print(const char *s)
       |             ^~~~~~~~~~
 arm-none-eabi-gcc -o "Embedded.elf" @"objects.list"   -mcpu=cortex-m0plus -T"C:\Users\Benho\Projects\TAMUCapstone-Group6-2026\Embedded\STM32L082CZYX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Embedded.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: Embedded.elf
@@ -82,11 +65,11 @@ Finished building target: Embedded.elf
 arm-none-eabi-size  Embedded.elf 
 arm-none-eabi-objdump -h -S Embedded.elf  > "Embedded.list"
    text	   data	    bss	    dec	    hex	filename
- 114144	    372	   8356	 122872	  1dff8	Embedded.elf
+ 119724	    380	   8380	 128484	  1f5e4	Embedded.elf
 Finished building: default.size.stdout
  
 Finished building: Embedded.list
  
 
-14:45:06 Build Finished. 0 errors, 13 warnings. (took 3s.139ms)
+17:18:28 Build Finished. 0 errors, 10 warnings. (took 7s.228ms)
 
