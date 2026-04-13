@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
+import { ValveDisplay } from "./components/ValveDisplay";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 type EventItem = {
@@ -113,7 +115,8 @@ function App() {
       <div className="mx-auto flex max-w-7xl flex-col gap-6">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div className="flex min-h-55 items-center justify-center rounded-2xl border border-gray-200 bg-white">
-            <p className="text-sm text-gray-400">Position Visualization</p>
+            {/* <p className="text-sm text-gray-400">Position Visualization</p> */}
+            <ValveDisplay angle={20} />
           </div>
 
           <div className="rounded-2xl border border-gray-200 bg-white p-8">
