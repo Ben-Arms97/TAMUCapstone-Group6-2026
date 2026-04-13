@@ -25,7 +25,6 @@
 #include "app_lorawan.h"
 #include "adc.h"
 #include "usart.h"
-#include "sys_app.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -112,7 +111,6 @@ int main(void)
   MX_ADC_Init();
   MX_USART1_UART_Init();
   //MX_I2C1_Init();
-  BSP_I2C1_Init();
   /* USER CODE BEGIN 2 */
   (void)HAL_ADC_Start(&hadc);
 
@@ -145,12 +143,13 @@ int main(void)
     float sin = adc_values[0]/4096.0f - 0.5;
     float cos = adc_values[1]/4096.0f - 0.5;
 
-	float angle = atan2(sin, cos) * 180/M_PI; //- init
+	//float angle = atan2(sin, cos) * 180/M_PI; //- init
 
+	snprintf(msg, sizeof(msg), "sin=%u cos=%u\r\n", adc_values[0], adc_values[1]);
 	APP_LOG(TS_ON, VLEVEL_L, msg);
-	MX_LoRaWAN_Process();
+	//MX_LoRaWAN_Process();
 
-	HAL_Delay(5000);
+
   }
   /* USER CODE END 3 */
 }

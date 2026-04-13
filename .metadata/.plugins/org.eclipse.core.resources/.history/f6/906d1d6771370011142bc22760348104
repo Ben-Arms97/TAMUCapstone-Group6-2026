@@ -148,7 +148,7 @@ int main(void)
 	float angle = atan2(sin, cos) * 180/M_PI; //- init
 
 	APP_LOG(TS_ON, VLEVEL_L, msg);
-	MX_LoRaWAN_Process();
+	//MX_LoRaWAN_Process();
 
 	HAL_Delay(5000);
   }

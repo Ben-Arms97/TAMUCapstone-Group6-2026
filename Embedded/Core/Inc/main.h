@@ -41,7 +41,20 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
+#define IQS211B_ADDR   		(0x7E << 1) //should be 47 but not there
+#define DA7280_ADDR    		(0x4A << 1)
 
+#define LIS2MDL_ADDR 		(0x1E << 1)
+#define CFG_REG_A           0x60
+#define CFG_REG_B           0x61
+#define CFG_REG_C           0x62
+#define INT_CRTL_REG        0x63
+#define STATUS_REG          0x67
+#define OUTX_L              0x68
+
+#define LONG_TOUCH_TIME_MS 	10000  // 10 second
+
+#define M_PI 				3.14159265358979323846
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
