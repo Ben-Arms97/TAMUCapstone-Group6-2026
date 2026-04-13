@@ -38,6 +38,7 @@
 #include "CayenneLpp.h"
 #include "sys_sensors.h"
 #include "cmwx1zzabz_0xx.h"
+#include "main.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -298,22 +299,15 @@ static void SendTxData(void)
   UTIL_TIMER_Time_t nextTxIn = 0;
   uint8_t i = 0;
 
-  /* Test constants */
-  uint8_t battery = 95;          // test battery value
-  int32_t latitude = 3075768;    // example scaled test value
-  int32_t longitude = -9675912;  // example scaled test value
+  float angle = Read_Angle_Sensor();
+
+  /* Scale to fixed-point: 2 decimal places, e.g. 123.45° → 12345 */
+  uint16_t angle_scaled = (uint16_t)(angle);
 
   AppData.Port = LORAWAN_USER_APP_PORT;
 
-  AppData.Buffer[i++] = battery;
-
-//  AppData.Buffer[i++] = (uint8_t)((latitude >> 16) & 0xFF);
-//  AppData.Buffer[i++] = (uint8_t)((latitude >> 8) & 0xFF);
-//  AppData.Buffer[i++] = (uint8_t)(latitude & 0xFF);
-
-//  AppData.Buffer[i++] = (uint8_t)((longitude >> 16) & 0xFF);
-//  AppData.Buffer[i++] = (uint8_t)((longitude >> 8) & 0xFF);
-  AppData.Buffer[i++] = (uint8_t)(longitude & 0xFF);
+  AppData.Buffer[i++] = (uint8_t)((angle_scaled >> 8) & 0xFF);
+  AppData.Buffer[i++] = (uint8_t)(angle_scaled & 0xFF);
 
   AppData.BufferSize = i;
 
@@ -324,8 +318,8 @@ static void SendTxData(void)
 
   if (status == LORAMAC_HANDLER_SUCCESS)
   {
-    APP_LOG(TS_ON, VLEVEL_L, "SEND REQUEST: battery=%d lat=%d lon=%d\r\n",
-            (int)battery, (int)latitude, (int)longitude);
+    APP_LOG(TS_ON, VLEVEL_L, "SEND REQUEST: angle_scaled=%d\r\n",
+            (int)angle_scaled);
   }
   else if (nextTxIn > 0)
   {
