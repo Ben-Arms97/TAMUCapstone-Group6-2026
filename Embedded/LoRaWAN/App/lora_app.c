@@ -299,7 +299,7 @@ static void SendTxData(void)
   UTIL_TIMER_Time_t nextTxIn = 0;
   uint8_t i = 0;
 
-  float angle = Read_Angle_Sensor();
+  float angle = angle_reading.angle_val;
 
   /* Scale to fixed-point: 2 decimal places, e.g. 123.45° → 12345 */
   uint16_t angle_scaled = (uint16_t)(angle);
