@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   db:
     image: pgvector/pgvector:pg16
@@ -17,15 +15,31 @@ services:
       timeout: 5s
       retries: 20
 
+  mqtt:
+    image: eclipse-mosquitto:2
+    ports:
+      - "1883:1883"
+    command:
+      - sh
+      - -c
+      - |
+        cat > /mosquitto/config/mosquitto.conf <<'EOF'
+        listener 1883
+        allow_anonymous true
+        EOF
+        exec mosquitto -c /mosquitto/config/mosquitto.conf
+
   server:
     build: ./backend
     env_file:
-      - ./backend/.env
+      - ./backend/.env.local
     ports:
       - "127.0.0.1:5000:5000"
     depends_on:
       db:
         condition: service_healthy
+      mqtt:
+        condition: service_started
     develop:
       watch:
         - path: ./backend
@@ -37,7 +51,7 @@ services:
   client:
     build: ./frontend
     env_file:
-      - ./frontend/.env
+      - ./frontend/.env.development
     ports:
       - "127.0.0.1:5173:5173"
     depends_on:

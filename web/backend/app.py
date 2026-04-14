@@ -1,16 +1,27 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
+from datetime import datetime, timezone
+import json
 from dotenv import load_dotenv
 
+from utils.PacketSniffer import PacketSniffer
 from database import db, Event
 
 load_dotenv()
 
+MQTT_HOST = "mqtt"
+MQTT_PORT = 1883
+MQTT_TOPIC = os.getenv("MQTT_TOPIC")
+
+test_packet_sniffer = None
+packet_sniffer = None
+
+
 def create_app():
     app = Flask(__name__)
-    
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('POSTGRESQL_CONNECTION_STRING')
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
+        "POSTGRESQL_CONNECTION_STRING")
 
     CORS(app, supports_credentials=True)
 
@@ -20,27 +31,88 @@ def create_app():
 
     return app
 
+
+def setup_packet_sniffer(app):
+    global test_packet_sniffer, packet_sniffer
+
+    def handle_packets(msg):
+        payload_bytes = bytes(msg.payload)
+        payload_bytes_list = list(payload_bytes)
+
+        try:
+            payload_text = payload_bytes.decode("utf-8", errors="replace")
+        except Exception:
+            payload_text = None
+
+        packet_info = {
+            "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "topic": msg.topic,
+            "qos": msg.qos,
+            "retain": msg.retain,
+            "payload_hex": payload_bytes.hex(),
+            "payload_bytes": payload_bytes_list,
+            "payload_text": payload_text,
+        }
+
+        if payload_text:
+            stripped = payload_text.strip()
+            if stripped.startswith("{") or stripped.startswith("["):
+                try:
+                    packet_info["payload_json"] = json.loads(stripped)
+                except Exception:
+                    pass
+
+        try:
+            if len(payload_bytes_list) < 2:
+                raise ValueError(
+                    "Payload must contain at least 2 bytes for angle and battery")
+
+            angle = payload_bytes_list[0]
+            battery = payload_bytes_list[1]
+
+            with app.app_context():
+                new_event = Event(angle=angle, battery=battery)
+                db.session.add(new_event)
+                db.session.commit()
+
+        except Exception as error:
+            with app.app_context():
+                db.session.rollback()
+            print(f"Error processing data: {error}")
+
+        return packet_info
+
+    test_packet_sniffer = PacketSniffer(MQTT_HOST, MQTT_PORT, [("#", 0)])
+    test_packet_sniffer.sniff_packets()
+
+    packet_sniffer = PacketSniffer(
+        MQTT_HOST,
+        MQTT_PORT,
+        [(MQTT_TOPIC, 0)],
+        handle_packets,
+    )
+    packet_sniffer.sniff_packets()
+
+
 def register_routes(app):
     @app.route("/")
     def hello_world():
         return "Hello, World!"
-    
-    @app.route('/event', methods=['GET'])
+
+    @app.route("/event", methods=["GET"])
     def get_events():
-        data = []
-
         events = Event.query.all()
-        for event in events:
-            event_data = {
-                'id': event.id,
-                'angle': event.angle,
-                'battery': event.battery,
-                'timestamp': event.timestamp
+        data = [
+            {
+                "id": event.id,
+                "angle": event.angle,
+                "battery": event.battery,
+                "timestamp": event.timestamp,
             }
-            data.append(event_data)
+            for event in events
+        ]
+        return jsonify({"events": data}), 200
 
-        return jsonify({'events': data}), 200
-    
     @app.route("/event", methods=["POST"])
     def post_event():
         data = request.get_json(force=True)
@@ -51,11 +123,7 @@ def register_routes(app):
         if angle is None or battery is None:
             return jsonify({"error": "angle and battery are required"}), 400
 
-        new_event = Event(
-            angle=angle,
-            battery=battery,
-        )
-
+        new_event = Event(angle=angle, battery=battery)
         db.session.add(new_event)
         db.session.commit()
 
@@ -65,6 +133,20 @@ def register_routes(app):
             "battery": new_event.battery,
             "timestamp": new_event.timestamp
         }), 201
-    
+
+    @app.route("/packets")
+    def log_packets():
+        if test_packet_sniffer is None:
+            return jsonify({"error": "test packet sniffer not initialized"}), 500
+        return jsonify(list(test_packet_sniffer.get_captured_packets()))
+
+    @app.route("/prodpackets")
+    def log_prod_packets():
+        if packet_sniffer is None:
+            return jsonify({"error": "prod packet sniffer not initialized"}), 500
+        return jsonify(list(packet_sniffer.get_captured_packets()))
+
+
 app = create_app()
+setup_packet_sniffer(app)
 register_routes(app)
