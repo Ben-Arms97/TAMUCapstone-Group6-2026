@@ -6,6 +6,7 @@ import json
 from dotenv import load_dotenv
 
 from utils.PacketSniffer import PacketSniffer
+from utils.ClearDatabase import start_truncate_job
 from database import db, Event
 
 load_dotenv()
@@ -13,6 +14,8 @@ load_dotenv()
 MQTT_HOST = "mqtt"
 MQTT_PORT = 1883
 MQTT_TOPIC = os.getenv("MQTT_TOPIC")
+
+MESSAGE_CLEAR_INTERVAL = os.getenv('MESSAGE_CLEAR_INTERVAL')
 
 test_packet_sniffer = None
 packet_sniffer = None
@@ -150,3 +153,4 @@ def register_routes(app):
 app = create_app()
 setup_packet_sniffer(app)
 register_routes(app)
+start_truncate_job(app, db, MESSAGE_CLEAR_INTERVAL)
