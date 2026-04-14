@@ -115,15 +115,19 @@ function App() {
       <div className="mx-auto flex max-w-7xl flex-col gap-6">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div className="flex min-h-55 items-center justify-center rounded-2xl border border-gray-200 bg-white">
-            {/* <p className="text-sm text-gray-400">Position Visualization</p> */}
-            <ValveDisplay angle={20} />
+            {!selectedEvent ? (
+              <div className="flex h-full flex-col items-center justify-center text-center text-slate-500">
+                <p className="text-sm font-medium">No event selected</p>
+                <p className="mt-1 text-xs text-slate-400">
+                  Select an event from the log to view valve position
+                </p>
+              </div>
+            ) : (
+              <ValveDisplay angle={selectedEvent.angle} size={220} />
+            )}
           </div>
 
           <div className="rounded-2xl border border-gray-200 bg-white p-8">
-            <p className="mb-5 text-base font-semibold text-gray-800">
-              Position Details
-            </p>
-
             {selectedEvent ? (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div className="rounded-xl bg-gray-50 px-4 py-3">
@@ -165,8 +169,11 @@ function App() {
                 </div>
               </div>
             ) : (
-              <div className="rounded-xl bg-gray-50 px-4 py-6 text-sm text-gray-500">
-                No position data available yet.
+              <div className="flex h-full flex-col items-center justify-center text-center text-slate-500">
+                <p className="text-sm font-medium">No event selected</p>
+                <p className="mt-1 text-xs text-slate-400">
+                  Select an event from the log to view position information
+                </p>
               </div>
             )}
           </div>
