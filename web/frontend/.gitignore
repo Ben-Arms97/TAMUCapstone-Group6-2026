@@ -69,12 +69,6 @@ Thumbs.db
 .idea/
 
 # --------------------
-# Docker artifacts
-# --------------------
-Dockerfile*
-docker-compose*.yml
-
-# --------------------
 # Docs / Media
 # --------------------
 *.pdf
