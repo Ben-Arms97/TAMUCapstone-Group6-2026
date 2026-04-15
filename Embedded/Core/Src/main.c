@@ -21,7 +21,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "sensor.h"
 #include "app_lorawan.h"
 #include "adc.h"
 #include "usart.h"
@@ -40,7 +39,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-static void uart_print(const char *s);
+//static void uart_print(const char *s);
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -57,13 +56,16 @@ UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 uint32_t adc_vals_prev [2];
+uint32_t open_angle, closed_angle;
 Angle_Return angle_reading;
+CALIBRATION_STAGE calibration_stage;
+ROTATION_DIRECTION rot_dir;
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
+void Cap_Sense_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -111,38 +113,80 @@ int main(void)
   MX_ADC_Init();
   MX_USART1_UART_Init();
   BSP_I2C1_Init();
+  Cap_Sense_Init();
+  Haptic_Init();
   /* USER CODE BEGIN 2 */
   (void)HAL_ADC_Start(&hadc);
 
   int temp = 0;
 
+  //initialize previous values
+  adc_vals_prev[0] = 0;
+  adc_vals_prev[1] = 0;
+  calibration_stage = CALIB_OPEN;
+
 
   /* USER CODE END 2 */
-//  HAL_Delay(1000);
-//
-//  char msg[64];
-//  for (uint16_t addr = 1; addr < 128; addr++)
-//	{
-//		if (HAL_I2C_IsDeviceReady(&hi2c1, addr << 1, 1, 10) == HAL_OK)
-//		{
-//			snprintf(msg, sizeof(msg), "Device found at 0x%02X\r\n", addr);
-//			APP_LOG(TS_ON, VLEVEL_L, msg);
-//		}
-//	}
+  char msg[64];
+
+  //2 quick buzzes
+  Vibrate(50);
+  HAL_Delay(300);
+  Vibrate(0);
+  HAL_Delay(300);
+  Vibrate(50);
+  HAL_Delay(300);
+  Vibrate(0);
+
+  GPIO_PinState not_touched = HAL_GPIO_ReadPin(CAP_SENSE_PORT, CAP_SENSE_PIN);
+  while(not_touched){ //wait for touch
+	  not_touched = HAL_GPIO_ReadPin(CAP_SENSE_PORT, CAP_SENSE_PIN);
+  }
+  Read_Angle_Sensor();
+  Vibrate(50);
+  HAL_Delay(500);
+  Vibrate(0);
+  HAL_Delay(5000);
+
+  calibration_stage = CALIB_CLOSED;
+  not_touched = HAL_GPIO_ReadPin(CAP_SENSE_PORT, CAP_SENSE_PIN);
+  while(not_touched){ //wait for touch
+	  not_touched = HAL_GPIO_ReadPin(CAP_SENSE_PORT, CAP_SENSE_PIN);
+  }
+  Read_Angle_Sensor();
+
+  Vibrate(50);
+  HAL_Delay(500);
+  Vibrate(0);
+
+  HAL_Delay(1000);
+
+  Vibrate(50);
+  HAL_Delay(1000);
+  Vibrate(0);
+  HAL_Delay(500);
+  Vibrate(50);
+  HAL_Delay(1000);
+  Vibrate(0);
+
+
+  calibration_stage = CALIB_DONE;
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  if(temp < 10 || angle_reading.changed == 1){
-		  MX_LoRaWAN_Process();
-	  }
-	  if(temp > 10){
-		  Read_Angle_Sensor();
-		  HAL_Delay(10000);
-	  }
-	  temp++;
+	//   if(temp < 10 || angle_reading.changed == 1){
+	// 	  MX_LoRaWAN_Process();
+	//   }
+	//   if(temp > 10){
+	// 	  Read_Angle_Sensor();
+	// 	  HAL_Delay(10000);
+	//   }
+	//   temp++;
+	  Read_Angle_Sensor();
+	  HAL_Delay(10000);
   }
   /* USER CODE END 3 */
 }
@@ -197,112 +241,98 @@ void SystemClock_Config(void)
   }
 }
 
-/**
-  * @brief I2C1 Initialization Function
-  * @param None
-  * @retval None
-  */
-//static void MX_I2C1_Init(void)
-//{
-//
-//  /* USER CODE BEGIN I2C1_Init 0 */
-//
-//  /* USER CODE END I2C1_Init 0 */
-//
-//  /* USER CODE BEGIN I2C1_Init 1 */
-//
-//  /* USER CODE END I2C1_Init 1 */
-//  hi2c1.Instance = I2C1;
-//  hi2c1.Init.Timing = 0x00000608;
-//  hi2c1.Init.OwnAddress1 = 0;
-//  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-//  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-//  hi2c1.Init.OwnAddress2 = 0;
-//  hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
-//  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-//  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-//  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
-//  {
-//    Error_Handler();
-//  }
-//
-//  /** Configure Analogue filter
-//  */
-//  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
-//  {
-//    Error_Handler();
-//  }
-//
-//  /** Configure Digital filter
-//  */
-//  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
-//  {
-//    Error_Handler();
-//  }
-//  /* USER CODE BEGIN I2C1_Init 2 */
-//
-//  /* USER CODE END I2C1_Init 2 */
-//
-//}
-
 /* USER CODE BEGIN 4 */
-void da7280_write(uint8_t reg, uint8_t val)
+void Cap_Sense_Init(void)
 {
-    HAL_I2C_Mem_Write(&hi2c1, DA7280_ADDR, reg, 1, &val, 1, HAL_MAX_DELAY);
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+	GPIO_InitStruct.Pin = CAP_SENSE_PIN;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	GPIO_InitStruct.Pull = GPIO_PULLUP;
+
+	HAL_GPIO_Init(CAP_SENSE_PORT, &GPIO_InitStruct);
 }
 
-void LIS2MDL_Write(uint8_t reg, uint8_t value)
+void Haptic_Write(uint8_t reg, uint8_t val)
 {
-    HAL_I2C_Mem_Write(&hi2c1, LIS2MDL_ADDR, reg,
-                      I2C_MEMADD_SIZE_8BIT,
-                      &value, 1, HAL_MAX_DELAY);
+    HAL_I2C_Mem_Write(&hi2c1, HAPTIC_ADDR, reg, 1, &val, 1, HAL_MAX_DELAY);
 }
 
-void LIS2MDL_Read(uint8_t reg, uint8_t *buf, uint8_t len)
+uint8_t Haptic_Read(uint8_t reg)
 {
-    HAL_I2C_Mem_Read(&hi2c1, LIS2MDL_ADDR, reg,
-                     I2C_MEMADD_SIZE_8BIT,
-                     buf, len, HAL_MAX_DELAY);
+	uint8_t temp;
+    HAL_I2C_Mem_Read(&hi2c1, HAPTIC_ADDR, reg, 1, &temp, 1, HAL_MAX_DELAY);
+    return temp;
 }
 
-void LIS2MDL_Init(void)
+void Haptic_Init(){
+	//
+	uint8_t rev = Haptic_Read(0x00);
+
+	// Write the full-scale of unsigned haptic waveform
+	Haptic_Write(0x0C, 1.8f / (23.4e-3f));
+
+	// Write the absolute actuator maximum voltage rating
+	Haptic_Write(0x0D, 2.616f / (23.4e-3f));
+
+	// Write the actuator max current rating
+	float currMax = 90.0f; // mA
+	uint8_t scaledCurrMax = (currMax - 28.6f) / 7.2f;
+	Haptic_Write(0x0E, scaledCurrMax);
+
+	// Write the value for translating actuator impedance to output voltage drive level
+	float impedance = 40.0f; // Ohms
+	uint16_t v2iFactor = (impedance * (scaledCurrMax + 4)) / 1.6104f;
+	uint8_t v2iFactor_h = (v2iFactor >> 8) & 0xFF;
+	uint8_t v2iFactor_l = v2iFactor & 0xFF;
+	Haptic_Write(0x0F, v2iFactor_h);
+	Haptic_Write(0x10, v2iFactor_l);
+
+	// Specify the LRA drive frequency
+	float lraFreq = 235.0f; // Hz
+	uint16_t lraPeriod = 1 / (lraFreq * (1333.32e-9f));
+	uint8_t lraPeriod_h = (lraPeriod >> 7) & 0xFF;
+	uint8_t lraPeriod_l = lraPeriod & 0x7F;
+	Haptic_Write(0x0A, lraPeriod_h);
+	Haptic_Write(0x0B, lraPeriod_l);
+
+	// Set to DRO mode (12C)
+	Haptic_Write(0x22, 0x01);
+
+	// Set UVLO threshold to 2.7 V
+	Haptic_Write(0x5F, 0);
+
+	// Clear all flags
+	Haptic_Write(0x03, 0xFF);
+}
+
+void Vibrate(uint8_t val)
 {
-    // 1. Continuous mode, 10 Hz
-    LIS2MDL_Write(CFG_REG_A, 0x00);
-    // OM = ultra-low-power, ODR = 10 Hz, continuous mode
-
-    // 2. Default filtering
-    LIS2MDL_Write(CFG_REG_B, 0x01);
-
-    // 3. Enable DRDY on INT pin
-    LIS2MDL_Write(CFG_REG_C, 0x01);
-    // DRDY_on_PIN = 1
-
-    // 4. Configure interrupt control
-    LIS2MDL_Write(INT_CRTL_REG, 0x01);
-    // Enable interrupt generation
-//
-//    //latch so it wakes the core
-//    LIS2MDL_Write(CFG_REG_C, 0x05);
+	Haptic_Write(0x23, val);
 }
 
 uint32_t read_adc_channel(uint32_t channel)
 {
-	//making sure channel select works as intended
+	// Making sure channel select works as intended
     HAL_ADC_Stop(&hadc);
 
+    // Stop reading from channel
     ADC1->CHSELR = 0;
 
+    // Select next channel
     if (channel == ADC_CHANNEL_2)
         ADC1->CHSELR |= ADC_CHSELR_CHSEL2;
     else if (channel == ADC_CHANNEL_3)
         ADC1->CHSELR |= ADC_CHSELR_CHSEL3;
 
+    // Read from current channel
     HAL_ADC_Start(&hadc);
     HAL_ADC_PollForConversion(&hadc, HAL_MAX_DELAY);
 
+    // Get value form ADC
     uint32_t val = HAL_ADC_GetValue(&hadc);
 
+    // Stop reading from ADC
     HAL_ADC_Stop(&hadc);
 
     return val;
@@ -320,59 +350,76 @@ void Read_Angle_Sensor(){
 	snprintf(msg, sizeof(msg), "adc0=%d adc1=%d\r\n", adc_values[0], adc_values[1]);
 	APP_LOG(TS_ON, VLEVEL_L, msg);
 
-    // if doesn't pass thresholds
-    if(adc_values[0] < adc_vals_prev[0] + 50 && adc_values[0] > adc_vals_prev[0] - 50 && adc_values[1] < adc_vals_prev[1] + 50 && adc_values[1] > adc_vals_prev[1] - 50){
+    // If values don't pass thresholds and not in calibration mode
+    if(adc_values[0] < adc_vals_prev[0] + 50 && adc_values[0] > adc_vals_prev[0] - 50 && adc_values[1] < adc_vals_prev[1] + 50 && adc_values[1] > adc_vals_prev[1] - 50 && calibration_stage == 0){
     	angle_reading.angle_val = 0;
         angle_reading.changed = 0;
         return;
     }
 
-	// Angle Calculation
+	// Angle calculation - normalize ADC values as sensor readings are offset by VDD/2
+    // This corresponds to ADC values being half of ADC max (2048) higher than we want
 	int sin = adc_values[0] - 2048;
 	int cos = adc_values[1] - 2048;
-//	snprintf(msg, sizeof(msg), "sin=%d cos=%d\r\n", sin, cos);
-//	APP_LOG(TS_ON, VLEVEL_L, msg);
 
-	float angle = atan2(sin, cos) * 180/M_PI + 180;
+    // Convert to degrees and make positive
+	float angle = (atan2f(sin, cos) * 180/M_PI) + 180;
 
-	snprintf(msg, sizeof(msg), "angle=%d\r\n", sin, cos);
+	snprintf(msg, sizeof(msg), "angle=%d\r\n", (int)angle);
+
+    // If not in calibration stage, send normalized value to server
+	if(calibration_stage == CALIB_DONE){
+      if(rot_dir == CW){
+        angle_reading.angle_val =  angle - closed_angle;
+      }
+      else if(rot_dir == CCW){
+        angle_reading.angle_val = -1 * (angle - closed_angle);
+      }
+      else if(rot_dir == CW_OVF){
+        if(angle < 180){
+          angle += 360;
+        }
+        angle_reading.angle_val = angle - closed_angle;
+      }
+      else if(rot_dir == CCW_OVF){
+        if(angle < 180){
+          angle += 360;
+        }
+        angle_reading.angle_val = -1 * (angle - closed_angle);
+      }
+	  angle_reading.changed = 1;
+
+      adc_vals_prev[0] = adc_values[0];
+	  adc_vals_prev[1] = adc_values[1];
+	  snprintf(msg, sizeof(msg), "angle=%d\r\n", angle_reading.angle_val);
+	}
+    // If in calibration, take open and closed values
+	else if(calibration_stage == CALIB_OPEN){
+	  open_angle = angle;
+	}
+	else if(calibration_stage == CALIB_CLOSED){
+	  closed_angle = angle;
+      if(closed_angle < open_angle){
+        if(open_angle - closed_angle > 180){ // CCW overflow
+            rot_dir = CCW_OVF;
+        }
+        else {
+          rot_dir = CW;
+        }
+      } else{
+        if(closed_angle - open_angle > 180){ // CW overflow
+          rot_dir = CW;
+        }
+        else{
+          rot_dir = CCW;
+        }
+      }
+	}
 	APP_LOG(TS_ON, VLEVEL_L, msg);
-
-	angle_reading.angle_val = angle;
-	angle_reading.changed = 1;
-
-	adc_vals_prev[0] = adc_values[0];
-	adc_vals_prev[1] = adc_values[1];
 
 	return;
 }
 
-uint8_t detect_touch(){
-	uint8_t flags;
-
-	char msg[64];
-
-	if (HAL_I2C_IsDeviceReady(&hi2c1, IQS211B_ADDR, 10, HAL_MAX_DELAY) == HAL_OK)
-	{
-		HAL_I2C_Mem_Read(&hi2c1, IQS211B_ADDR, 0x00, I2C_MEMADD_SIZE_8BIT, &flags, 1, 100);
-
-		snprintf(msg, sizeof(msg), "product number = %x\r\n", flags);
-		HAL_UART_Transmit(&huart1, (uint8_t *)msg, (uint16_t)strlen(msg), HAL_MAX_DELAY);
-
-		HAL_I2C_Mem_Read(&hi2c1, IQS211B_ADDR, 0x01, I2C_MEMADD_SIZE_8BIT, &flags, 1, 100);
-
-		snprintf(msg, sizeof(msg), "firmware = %x\r\n", flags);
-		HAL_UART_Transmit(&huart1, (uint8_t *)msg, (uint16_t)strlen(msg), HAL_MAX_DELAY);
-	}
-	else {
-		snprintf(msg, sizeof(msg), "Error: no ACK\r\n", flags);
-		HAL_UART_Transmit(&huart1, (uint8_t *)msg, (uint16_t)strlen(msg), HAL_MAX_DELAY);
-	}
-
-
-	//check if fourth bit is 1
-	return (flags & (1<<4)) ? 1 : 0;
-}
 
 /* USER CODE END 4 */
 

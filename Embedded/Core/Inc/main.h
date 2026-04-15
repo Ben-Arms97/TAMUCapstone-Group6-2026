@@ -37,17 +37,18 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 typedef struct {
-    float angle_val;
+    int angle_val;
     uint8_t changed;
 } Angle_Return;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-#define IQS211B_ADDR   		(0x7E << 1) //should be 47 but not there
-#define DA7280_ADDR    		(0x4A << 1)
+//Haptic Feedback - DA7280
+#define HAPTIC_ADDR    		(0x4A << 1)
 
-#define LIS2MDL_ADDR 		(0x1E << 1)
+//Magnetometer - LIS2MDL
+#define MAGNETOMETER_ADDR 	(0x1E << 1)
 #define CFG_REG_A           0x60
 #define CFG_REG_B           0x61
 #define CFG_REG_C           0x62
@@ -55,9 +56,26 @@ typedef struct {
 #define STATUS_REG          0x67
 #define OUTX_L              0x68
 
-#define LONG_TOUCH_TIME_MS 	10000  // 10 second
+//Capacitive Sensor
+#define CAP_SENSE_PIN       GPIO_PIN_2
+#define CAP_SENSE_PORT      GPIOB
 
 #define M_PI 				3.14159265358979323846
+
+//Calibration stage enum
+typedef enum {
+	CALIB_DONE,
+	CALIB_OPEN,
+	CALIB_CLOSED
+} CALIBRATION_STAGE;
+
+//Rotation direction enum - direction rotated during calibration
+typedef enum {
+	CW,             // Clockwise - Open > Closed
+	CCW,            // Counter clockwise - Closed > Open
+	CW_OVF,         // Clockwise where one val overflows (wraps around 360)
+    CCW_OVF         // Counter clockwise where one val overflows
+} ROTATION_DIRECTION;
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
