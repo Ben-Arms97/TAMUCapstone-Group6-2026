@@ -15,7 +15,7 @@ MQTT_HOST = "mqtt"
 MQTT_PORT = 1883
 MQTT_TOPIC = os.getenv("MQTT_TOPIC")
 
-MESSAGE_CLEAR_INTERVAL = os.getenv('MESSAGE_CLEAR_INTERVAL')
+MESSAGE_CLEAR_INTERVAL = float(os.getenv('MESSAGE_CLEAR_INTERVAL'))
 
 test_packet_sniffer = None
 packet_sniffer = None
