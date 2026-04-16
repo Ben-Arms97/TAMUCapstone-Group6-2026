@@ -66,15 +66,10 @@ def setup_packet_sniffer(app):
                     pass
 
         try:
-            if len(payload_bytes_list) < 2:
-                raise ValueError(
-                    "Payload must contain at least 2 bytes for angle and battery")
-
-            angle = payload_bytes_list[0]
-            battery = payload_bytes_list[1]
+            angle = int.from_bytes(payload_bytes[:2], byteorder='big')
 
             with app.app_context():
-                new_event = Event(angle=angle, battery=battery)
+                new_event = Event(angle=angle, battery=0)
                 db.session.add(new_event)
                 db.session.commit()
 
