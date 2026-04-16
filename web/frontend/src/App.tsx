@@ -153,7 +153,7 @@ function App() {
                   </p>
                 </div>
               ) : (
-                <ValveDisplay angle={displayedEvent.angle} size={220} />
+                <ValveDisplay angle={displayedEvent.angle} size={220} isLive={isLive} />
               )}
             </div>
           </div>

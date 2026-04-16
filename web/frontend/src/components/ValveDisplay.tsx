@@ -3,11 +3,13 @@ import React from "react";
 interface ValveDisplayProps {
     angle: number;
     size?: number;
+    isLive?: boolean
 }
 
 export const ValveDisplay: React.FC<ValveDisplayProps> = ({
     angle,
     size = 280,
+    isLive
 }) => {
     const clampedAngle = Math.max(0, Math.min(angle, 360));
     const center = size / 2;
@@ -70,12 +72,12 @@ export const ValveDisplay: React.FC<ValveDisplayProps> = ({
                 </svg>
             </div>
 
-            <div className="mt-2 grid grid-cols-2 gap-2 rounded-xl bg-slate-50 px-3 py-2">
+            <div className={`mt-2 grid grid-cols-2 gap-2 rounded-xl bg-slate-50 px-3 py-2 ${isLive ? 'text-emerald-500' : 'text-amber-600'}`}>
                 <div className="text-center">
                     <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                         Angle
                     </p>
-                    <p className="mt-0.5 text-xl font-semibold text-emerald-500">
+                    <p className="mt-0.5 text-xl font-semibold">
                         {clampedAngle.toFixed(1)}°
                     </p>
                 </div>
@@ -84,7 +86,7 @@ export const ValveDisplay: React.FC<ValveDisplayProps> = ({
                     <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                         % Open
                     </p>
-                    <p className="mt-0.5 text-xl font-semibold text-emerald-500">
+                    <p className="mt-0.5 text-xl font-semibold">
                         {percentOpen.toFixed(1)}%
                     </p>
                 </div>
