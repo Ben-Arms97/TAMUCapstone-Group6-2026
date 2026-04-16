@@ -13,14 +13,10 @@ export const ValveDisplay: React.FC<ValveDisplayProps> = ({
     const center = size / 2;
     const radius = size * 0.34;
 
-    const radians = (clampedAngle * Math.PI) / 180;
-    const lineX = center + radius * Math.cos(radians);
-    const lineY = center - radius * Math.sin(radians);
-
     const percentOpen = (clampedAngle / 360) * 100;
 
     return (
-        <div className="flex h-full w-full flex-col rounded-3xl bg-white p-6 shadow-sm">
+        <div className="flex h-full w-full flex-col p-6 pt-2">
             <div className="flex flex-1 items-center justify-center">
                 <svg
                     width={size}
@@ -51,15 +47,23 @@ export const ValveDisplay: React.FC<ValveDisplayProps> = ({
                     />
 
                     {/* needle */}
-                    <line
-                        x1={center}
-                        y1={center}
-                        x2={lineX}
-                        y2={lineY}
-                        stroke="#f97316"
-                        strokeWidth="6"
-                        strokeLinecap="round"
-                    />
+                     <g
+                        style={{
+                            transform: `rotate(${-clampedAngle}deg)`,
+                            transformOrigin: `${center}px ${center}px`,
+                            transition: "transform 0.5s ease",
+                        }}
+                    >
+                        <line
+                            x1={center}
+                            y1={center}
+                            x2={center + radius}
+                            y2={center}
+                            stroke="#f97316"
+                            strokeWidth="6"
+                            strokeLinecap="round"
+                        />
+                    </g>
 
                     {/* center hub */}
                     <circle cx={center} cy={center} r={7} fill="#e2e8f0" />
