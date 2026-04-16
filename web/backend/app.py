@@ -66,7 +66,7 @@ def setup_packet_sniffer(app):
                     pass
 
         try:
-            angle = int.from_bytes(payload_bytes[:2], byteorder='big')
+            angle = int.from_bytes(payload_bytes[:2], byteorder='little') # little endian notation: byte[0] LSB and byte[1] MSB
 
             with app.app_context():
                 new_event = Event(angle=angle, battery=0)
