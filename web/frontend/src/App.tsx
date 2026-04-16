@@ -28,17 +28,17 @@ function formatDate(timestamp: string) {
   return new Date(timestamp).toLocaleDateString();
 }
 
-function getBatteryColor(battery: number) {
-  if (battery < 20) return "text-red-500";
-  if (battery < 50) return "text-amber-500";
-  return "text-gray-600";
-}
+// function getBatteryColor(battery: number) {
+//   if (battery < 20) return "text-red-500";
+//   if (battery < 50) return "text-amber-500";
+//   return "text-gray-600";
+// }
 
-function getBatteryLabel(battery: number) {
-  if (battery < 20) return "Low";
-  if (battery < 50) return "Medium";
-  return "Good";
-}
+// function getBatteryLabel(battery: number) {
+//   if (battery < 20) return "Low";
+//   if (battery < 50) return "Medium";
+//   return "Good";
+// }
 
 function LoadingState() {
   return (
@@ -46,7 +46,7 @@ function LoadingState() {
       <div className="grid grid-cols-3 border-b border-gray-200 bg-gray-50 px-5 py-3 text-xs font-medium text-gray-500">
         <span>Timestamp</span>
         <span className="text-center">Angle</span>
-        <span className="text-right">Battery</span>
+        {/* <span className="text-right">Battery</span> */}
       </div>
 
       <div className="animate-pulse">
@@ -129,12 +129,14 @@ function App() {
 
           <div className="rounded-2xl border border-gray-200 bg-white p-8">
             {selectedEvent ? (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <div className="rounded-xl bg-gray-50 px-4 py-3">
+              <div className="flex items-center justify-between rounded-2xl border border-gray-200 bg-white px-8 py-5">
+
+                {/* Timestamp */}
+                <div>
                   <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
                     Timestamp
                   </p>
-                  <p className="mt-2 text-sm font-semibold text-gray-800">
+                  <p className="mt-1 text-lg font-semibold text-gray-800">
                     {formatTime(selectedEvent.timestamp)}
                   </p>
                   <p className="text-xs text-gray-400">
@@ -142,31 +144,22 @@ function App() {
                   </p>
                 </div>
 
-                <div className="rounded-xl bg-gray-50 px-4 py-3">
+                {/* Divider */}
+                <div className="h-10 w-px bg-gray-200" />
+
+                {/* Angle */}
+                <div>
                   <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
                     Angle
                   </p>
-                  <p className="mt-2 text-sm font-semibold text-gray-800">
+                  <p className="mt-1 text-lg font-semibold text-gray-800">
                     {selectedEvent.angle}°
                   </p>
-                  <p className="text-xs text-gray-400">Degrees open</p>
+                  <p className="text-xs text-gray-400">
+                    Degrees open
+                  </p>
                 </div>
 
-                <div className="rounded-xl bg-gray-50 px-4 py-3">
-                  <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                    Battery
-                  </p>
-                  <p
-                    className={`mt-2 text-sm font-semibold ${getBatteryColor(
-                      selectedEvent.battery
-                    )}`}
-                  >
-                    {selectedEvent.battery}%
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    {getBatteryLabel(selectedEvent.battery)}
-                  </p>
-                </div>
               </div>
             ) : (
               <div className="flex h-full flex-col items-center justify-center text-center text-slate-500">
@@ -197,17 +190,17 @@ function App() {
             <EmptyState />
           ) : (
             <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
-              <div className="grid grid-cols-3 border-b border-gray-200 bg-gray-50 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+              <div className="grid grid-cols-[1fr_auto] border-b border-gray-200 bg-gray-50 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
                 <span>Timestamp</span>
-                <span className="text-center">Angle</span>
-                <span className="text-right">Battery</span>
+                <span>Angle</span>
+                {/* <span>Battery</span> */}
               </div>
 
               <div className="max-h-105 overflow-y-auto">
                 {events.map((event) => (
                   <div
                     key={event.id}
-                    className={`grid grid-cols-3 items-center border-b border-gray-100 px-5 py-4 text-sm ${selectedEvent?.id == event.id ? 'bg-gray-50' : ''} transition hover:bg-gray-50 last:border-b-0`}
+                    className={`grid grid-cols-[1fr_auto] items-center border-b border-gray-100 px-5 py-4 text-sm ${selectedEvent?.id == event.id ? 'bg-gray-50' : ''} transition hover:bg-gray-50 last:border-b-0`}
                     onClick={() => setSelectedEvent(event)}
                   >
                     <div className="flex flex-col">
@@ -223,11 +216,11 @@ function App() {
                       {event.angle}°
                     </div>
 
-                    <div className="text-right">
+                    {/* <div className="text-right">
                       <span className={`font-semibold ${getBatteryColor(event.battery)}`}>
                         {event.battery}%
                       </span>
-                    </div>
+                    </div> */}
                   </div>
                 ))}
               </div>

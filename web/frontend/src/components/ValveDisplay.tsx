@@ -20,7 +20,7 @@ export const ValveDisplay: React.FC<ValveDisplayProps> = ({
     const percentOpen = (clampedAngle / 360) * 100;
 
     return (
-        <div className="flex h-full w-full flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex h-full w-full flex-col rounded-3xl bg-white p-6 shadow-sm">
             <div className="flex flex-1 items-center justify-center">
                 <svg
                     width={size}
