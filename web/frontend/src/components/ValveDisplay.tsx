@@ -3,24 +3,22 @@ import React from "react";
 interface ValveDisplayProps {
     angle: number;
     size?: number;
+    isLive?: boolean
 }
 
 export const ValveDisplay: React.FC<ValveDisplayProps> = ({
     angle,
     size = 280,
+    isLive
 }) => {
     const clampedAngle = Math.max(0, Math.min(angle, 360));
     const center = size / 2;
     const radius = size * 0.34;
 
-    const radians = (clampedAngle * Math.PI) / 180;
-    const lineX = center + radius * Math.cos(radians);
-    const lineY = center - radius * Math.sin(radians);
-
     const percentOpen = (clampedAngle / 360) * 100;
 
     return (
-        <div className="flex h-full w-full flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex h-full w-full flex-col p-6 pt-2">
             <div className="flex flex-1 items-center justify-center">
                 <svg
                     width={size}
@@ -51,27 +49,35 @@ export const ValveDisplay: React.FC<ValveDisplayProps> = ({
                     />
 
                     {/* needle */}
-                    <line
-                        x1={center}
-                        y1={center}
-                        x2={lineX}
-                        y2={lineY}
-                        stroke="#f97316"
-                        strokeWidth="6"
-                        strokeLinecap="round"
-                    />
+                     <g
+                        style={{
+                            transform: `rotate(${-clampedAngle}deg)`,
+                            transformOrigin: `${center}px ${center}px`,
+                            transition: "transform 0.5s ease",
+                        }}
+                    >
+                        <line
+                            x1={center}
+                            y1={center}
+                            x2={center + radius}
+                            y2={center}
+                            stroke="#f97316"
+                            strokeWidth="6"
+                            strokeLinecap="round"
+                        />
+                    </g>
 
                     {/* center hub */}
                     <circle cx={center} cy={center} r={7} fill="#e2e8f0" />
                 </svg>
             </div>
 
-            <div className="mt-2 grid grid-cols-2 gap-2 rounded-xl bg-slate-50 px-3 py-2">
+            <div className={`mt-2 grid grid-cols-2 gap-2 rounded-xl bg-slate-50 px-3 py-2 ${isLive ? 'text-emerald-500' : 'text-amber-600'}`}>
                 <div className="text-center">
                     <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                         Angle
                     </p>
-                    <p className="mt-0.5 text-xl font-semibold text-emerald-500">
+                    <p className="mt-0.5 text-xl font-semibold">
                         {clampedAngle.toFixed(1)}°
                     </p>
                 </div>
@@ -80,7 +86,7 @@ export const ValveDisplay: React.FC<ValveDisplayProps> = ({
                     <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                         % Open
                     </p>
-                    <p className="mt-0.5 text-xl font-semibold text-emerald-500">
+                    <p className="mt-0.5 text-xl font-semibold">
                         {percentOpen.toFixed(1)}%
                     </p>
                 </div>
