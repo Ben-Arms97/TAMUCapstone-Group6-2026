@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { ValveDisplay } from "./components/ValveDisplay";
+import { ValveDisplay } from "../components/ValveDisplay";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
