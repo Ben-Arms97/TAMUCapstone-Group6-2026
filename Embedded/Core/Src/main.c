@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "app_lorawan.h"
+#include "lora_app.h"
 #include "adc.h"
 #include "usart.h"
 #include "sys_app.h"
@@ -40,6 +41,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 //static void uart_print(const char *s);
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -60,6 +62,9 @@ uint32_t open_angle, closed_angle;
 Angle_Return angle_reading;
 CALIBRATION_STAGE calibration_stage;
 ROTATION_DIRECTION rot_dir;
+
+int lower_bound_angle = 0;
+int upper_bound_angle = 90;
 
 /* USER CODE END PV */
 
@@ -107,6 +112,8 @@ int main(void)
   /* USER CODE END SysInit */
   MX_LoRaWAN_Init();
 
+
+
   /* Initialize all configured peripherals */
   MX_ADC_Init();
   MX_USART1_UART_Init();
@@ -118,75 +125,32 @@ int main(void)
   /* USER CODE BEGIN 2 */
   (void)HAL_ADC_Start(&hadc);
 
-  int temp = 0;
-
   //initialize previous values
   adc_vals_prev[0] = 0;
   adc_vals_prev[1] = 0;
   calibration_stage = CALIB_OPEN;
 
+  APP_LOG(TS_ON, VLEVEL_L, "Attempting to join LoRaWAN...\r\n");
 
+  while(join_flag == 0){
+	  MX_LoRaWAN_Process();
+  }
   /* USER CODE END 2 */
-  char msg[64];
-
-  //2 quick buzzes
-  Vibrate(50);
-  HAL_Delay(300);
-  Vibrate(0);
-  HAL_Delay(300);
-  Vibrate(50);
-  HAL_Delay(300);
-  Vibrate(0);
-
-  GPIO_PinState not_touched = HAL_GPIO_ReadPin(CAP_SENSE_PORT, CAP_SENSE_PIN);
-  while(not_touched){ //wait for touch
-	  not_touched = HAL_GPIO_ReadPin(CAP_SENSE_PORT, CAP_SENSE_PIN);
-  }
-  Read_Angle_Sensor();
-  Vibrate(50);
-  HAL_Delay(500);
-  Vibrate(0);
-  HAL_Delay(5000);
-
-  calibration_stage = CALIB_CLOSED;
-  not_touched = HAL_GPIO_ReadPin(CAP_SENSE_PORT, CAP_SENSE_PIN);
-  while(not_touched){ //wait for touch
-	  not_touched = HAL_GPIO_ReadPin(CAP_SENSE_PORT, CAP_SENSE_PIN);
-  }
-  Read_Angle_Sensor();
-
-  Vibrate(50);
-  HAL_Delay(500);
-  Vibrate(0);
-
-  HAL_Delay(1000);
-
-  Vibrate(50);
-  HAL_Delay(1000);
-  Vibrate(0);
-  HAL_Delay(500);
-  Vibrate(50);
-  HAL_Delay(1000);
-  Vibrate(0);
 
 
-  calibration_stage = CALIB_DONE;
+  APP_LOG(TS_ON, VLEVEL_L, "Awaiting Calibration\r\n");
+  Calibrate_Function();
+
+  //int angle = angle_reading.angle_val;
+
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	//   if(temp < 10 || angle_reading.changed == 1){
-	// 	  MX_LoRaWAN_Process();
-	//   }
-	//   if(temp > 10){
-	// 	  Read_Angle_Sensor();
-	// 	  HAL_Delay(10000);
-	//   }
-	//   temp++;
-	  Read_Angle_Sensor();
-	  HAL_Delay(10000);
+	MX_LoRaWAN_Process();
+
   }
   /* USER CODE END 3 */
 }
@@ -242,6 +206,8 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+
 void Cap_Sense_Init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -311,6 +277,75 @@ void Vibrate(uint8_t val)
 	Haptic_Write(0x23, val);
 }
 
+
+void Calibrate_Function(){
+
+
+	//2 quick buzzes
+	Vibrate(50);
+	HAL_Delay(300);
+	Vibrate(0);
+	HAL_Delay(300);
+	Vibrate(50);
+	HAL_Delay(300);
+	Vibrate(0);
+
+	GPIO_PinState not_touched = HAL_GPIO_ReadPin(CAP_SENSE_PORT, CAP_SENSE_PIN);
+
+	/*Bad way of getting an occasional vibration... Bruh, this works surprisingly well...
+		I added a recurring vibration because no one wants to be standing around for
+		who knows how long for the device to connect... This lets them know it's ready
+		when they come check on it.
+	*/
+	int wait_counter = 0;
+	while(not_touched){ //wait for touch
+		not_touched = HAL_GPIO_ReadPin(CAP_SENSE_PORT, CAP_SENSE_PIN);
+		wait_counter += 1;
+		if(wait_counter == 100000){
+			//2 quick buzzes
+			Vibrate(50);
+			HAL_Delay(300);
+			Vibrate(0);
+			HAL_Delay(300);
+			Vibrate(50);
+			HAL_Delay(300);
+			Vibrate(0);
+
+			wait_counter = 0;
+		}
+	}
+	Read_Angle_Sensor();
+	Vibrate(50);
+	HAL_Delay(500);
+	Vibrate(0);
+	HAL_Delay(5000);
+
+	calibration_stage = CALIB_CLOSED;
+	not_touched = HAL_GPIO_ReadPin(CAP_SENSE_PORT, CAP_SENSE_PIN);
+	while(not_touched){ //wait for touch
+	  not_touched = HAL_GPIO_ReadPin(CAP_SENSE_PORT, CAP_SENSE_PIN);
+	}
+	Read_Angle_Sensor();
+
+	Vibrate(50);
+	HAL_Delay(500);
+	Vibrate(0);
+
+	HAL_Delay(1000);
+
+	Vibrate(50);
+	HAL_Delay(1000);
+	Vibrate(0);
+	HAL_Delay(500);
+	Vibrate(50);
+	HAL_Delay(1000);
+	Vibrate(0);
+
+
+	calibration_stage = CALIB_DONE;
+}
+
+
 uint32_t read_adc_channel(uint32_t channel)
 {
 	// Making sure channel select works as intended
@@ -352,7 +387,7 @@ void Read_Angle_Sensor(){
 
     // If values don't pass thresholds and not in calibration mode
     if(adc_values[0] < adc_vals_prev[0] + 50 && adc_values[0] > adc_vals_prev[0] - 50 && adc_values[1] < adc_vals_prev[1] + 50 && adc_values[1] > adc_vals_prev[1] - 50 && calibration_stage == 0){
-    	angle_reading.angle_val = 0;
+    	//angle_reading.angle_val = 0;
         angle_reading.changed = 0;
         return;
     }
@@ -365,29 +400,36 @@ void Read_Angle_Sensor(){
     // Convert to degrees and make positive
 	float angle = (atan2f(sin, cos) * 180/M_PI) + 180;
 
-	snprintf(msg, sizeof(msg), "angle=%d\r\n", (int)angle);
-
     // If not in calibration stage, send normalized value to server
 	if(calibration_stage == CALIB_DONE){
       if(rot_dir == CW){
-        angle_reading.angle_val =  angle - closed_angle;
+    	angle = ((angle - closed_angle)/(open_angle-closed_angle)) * 90;
+    	angle_reading.angle_val = angle;
+        //angle_reading.angle_val =  angle - closed_angle;
       }
       else if(rot_dir == CCW){
-        angle_reading.angle_val = -1 * (angle - closed_angle);
+    	angle = ((closed_angle - angle)/(closed_angle-open_angle)) * 90;
+    	angle_reading.angle_val = angle;
+        //angle_reading.angle_val = -1 * (angle - closed_angle);
       }
       else if(rot_dir == CW_OVF){
         if(angle < 180){
           angle += 360;
         }
-        angle_reading.angle_val = angle - closed_angle;
+    	angle = ((angle - closed_angle)/((open_angle + 360)-closed_angle)) * 90;;
+        angle_reading.angle_val = angle;
+        //angle_reading.angle_val = angle - closed_angle;
       }
       else if(rot_dir == CCW_OVF){
-        if(angle < 180){
-          angle += 360;
+        if(angle > 180){
+          angle -= 360;
         }
-        angle_reading.angle_val = -1 * (angle - closed_angle);
+        angle = ((closed_angle - angle)/(closed_angle - (open_angle - 360))) * 90;
+        angle_reading.angle_val = angle;
+        //angle_reading.angle_val = -1 * (angle - closed_angle);
       }
 	  angle_reading.changed = 1;
+
 
       adc_vals_prev[0] = adc_values[0];
 	  adc_vals_prev[1] = adc_values[1];
@@ -399,6 +441,7 @@ void Read_Angle_Sensor(){
 	}
 	else if(calibration_stage == CALIB_CLOSED){
 	  closed_angle = angle;
+
       if(closed_angle < open_angle){
         if(open_angle - closed_angle > 180){ // CCW overflow
             rot_dir = CCW_OVF;
@@ -408,7 +451,7 @@ void Read_Angle_Sensor(){
         }
       } else{
         if(closed_angle - open_angle > 180){ // CW overflow
-          rot_dir = CW;
+          rot_dir = CW_OVF;
         }
         else{
           rot_dir = CCW;

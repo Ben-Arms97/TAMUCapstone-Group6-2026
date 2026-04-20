@@ -105,7 +105,7 @@ extern "C" {
 #define LORAWAN_DEFAULT_PING_SLOT_PERIODICITY       4
 
 /* USER CODE BEGIN EC */
-
+extern int join_flag;
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/

@@ -46,7 +46,10 @@
 
 /* External variables ---------------------------------------------------------*/
 /* USER CODE BEGIN EV */
+int join_flag = 0;
 
+// I'm not sure how the transmitting works. This is to allow it to run twice after the position changes..
+int send_angle_state = 0; // 0 = waiting | 1 = send again
 /* USER CODE END EV */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -296,38 +299,58 @@ static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
 
 static void SendTxData(void)
 {
-  UTIL_TIMER_Time_t nextTxIn = 0;
-  uint8_t i = 0;
+	Read_Angle_Sensor();
+	if(angle_reading.changed == 1 || join_flag == 0 || true){
 
-  float angle = angle_reading.angle_val;
+		UTIL_TIMER_Time_t nextTxIn = 0;
+		uint8_t i = 0;
 
-  /* Scale to fixed-point: 2 decimal places, e.g. 123.45° → 12345 */
-  uint16_t angle_scaled = (uint16_t)(angle);
+		float angle = angle_reading.angle_val;
 
-  AppData.Port = LORAWAN_USER_APP_PORT;
+		// Cleaning the angle a bit
+		if (angle < 0){
+			angle = 0;
+		}
+		else if (angle > 90){
+			angle = 90;
+		}
+		else if (angle >= 88){
+			angle = 90;
+		}
+		else if (angle <= 2){
+			angle = 0;
+		}
 
-  AppData.Buffer[i++] = (uint8_t)((angle_scaled >> 8) & 0xFF);
-  AppData.Buffer[i++] = (uint8_t)(angle_scaled & 0xFF);
+		/* Scale to fixed-point: 2 decimal places, e.g. 123.45° → 12345 */
+		uint16_t angle_scaled = (uint16_t)(angle);
 
-  AppData.BufferSize = i;
+		AppData.Port = LORAWAN_USER_APP_PORT;
 
-  LmHandlerErrorStatus_t status =
-      LmHandlerSend(&AppData, LORAWAN_DEFAULT_CONFIRMED_MSG_STATE, &nextTxIn, false);
+		AppData.Buffer[i++] = (uint8_t)((angle_scaled >> 8) & 0xFF);
+		AppData.Buffer[i++] = (uint8_t)(angle_scaled & 0xFF);
 
-  APP_LOG(TS_ON, VLEVEL_L, "LmHandlerSend status=%d\r\n", (int)status);
+		AppData.BufferSize = i;
 
-  if (status == LORAMAC_HANDLER_SUCCESS)
-  {
-    APP_LOG(TS_ON, VLEVEL_L, "SEND REQUEST: angle_scaled=%d\r\n",
-            (int)angle_scaled);
-  }
-  else if (nextTxIn > 0)
-  {
-    APP_LOG(TS_ON, VLEVEL_L, "Next Tx in: ~%d second(s)\r\n", (int)(nextTxIn / 1000));
-  }
-  else
-  {
-    APP_LOG(TS_ON, VLEVEL_L, "SEND REQUEST FAILED\r\n");
+
+		// Transmit
+		LmHandlerErrorStatus_t status =
+		  LmHandlerSend(&AppData, LORAWAN_DEFAULT_CONFIRMED_MSG_STATE, &nextTxIn, false);
+
+		APP_LOG(TS_ON, VLEVEL_L, "LmHandlerSend status=%d\r\n", (int)status);
+
+		if (status == LORAMAC_HANDLER_SUCCESS)
+		{
+			APP_LOG(TS_ON, VLEVEL_L, "SEND REQUEST: angle_scaled=%d\r\n",
+				(int)angle_scaled);
+		}
+		else if (nextTxIn > 0)
+		{
+			APP_LOG(TS_ON, VLEVEL_L, "Next Tx in: ~%d second(s)\r\n", (int)(nextTxIn / 1000));
+		}
+		else
+		{
+			APP_LOG(TS_ON, VLEVEL_L, "SEND REQUEST FAILED\r\n");
+		}
   }
 }
 
@@ -383,6 +406,7 @@ static void OnJoinRequest(LmHandlerJoinParams_t *joinParams)
     if (joinParams->Status == LORAMAC_HANDLER_SUCCESS)
     {
       APP_LOG(TS_OFF, VLEVEL_M, "\r\n###### = JOINED = ");
+      join_flag = 1; // Set Join Flag
       if (joinParams->Mode == ACTIVATION_TYPE_ABP)
       {
         APP_LOG(TS_OFF, VLEVEL_M, "ABP ======================\r\n");

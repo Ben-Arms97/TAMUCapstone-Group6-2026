@@ -88,6 +88,13 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 void Read_Angle_Sensor(void);
+
+void Vibrate(uint8_t val);
+
+void Calibrate_Function();
+
+void Haptic_Init();
+
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
