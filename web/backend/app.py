@@ -15,7 +15,7 @@ MQTT_HOST = "mqtt"
 MQTT_PORT = 1883
 MQTT_TOPIC = os.getenv("MQTT_TOPIC")
 
-MESSAGE_CLEAR_INTERVAL = os.getenv('MESSAGE_CLEAR_INTERVAL')
+MESSAGE_CLEAR_INTERVAL = float(os.getenv('MESSAGE_CLEAR_INTERVAL'))
 
 test_packet_sniffer = None
 packet_sniffer = None
@@ -66,15 +66,10 @@ def setup_packet_sniffer(app):
                     pass
 
         try:
-            if len(payload_bytes_list) < 2:
-                raise ValueError(
-                    "Payload must contain at least 2 bytes for angle and battery")
-
-            angle = payload_bytes_list[0]
-            battery = payload_bytes_list[1]
+            angle = int.from_bytes(payload_bytes[:2], byteorder='big', signed=True) # big endian notation: byte[0] MSB and byte[1] LSB, two's complement for negative numbers
 
             with app.app_context():
-                new_event = Event(angle=angle, battery=battery)
+                new_event = Event(angle=angle, battery=0)
                 db.session.add(new_event)
                 db.session.commit()
 
