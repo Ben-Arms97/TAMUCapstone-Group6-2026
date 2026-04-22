@@ -101,6 +101,8 @@ void Haptic_Init();
 
 /* USER CODE BEGIN Private defines */
 extern Angle_Return angle_reading;
+
+extern int one_time_send; // Have TX function allow a single transmit through
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

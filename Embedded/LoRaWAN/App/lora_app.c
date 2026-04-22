@@ -300,10 +300,13 @@ static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
 static void SendTxData(void)
 {
 	Read_Angle_Sensor();
-	if(angle_reading.changed == 1 || join_flag == 0 || true){
+	if(angle_reading.changed == 1 || one_time_send == 1){
 
 		UTIL_TIMER_Time_t nextTxIn = 0;
 		uint8_t i = 0;
+
+		// Reset One Time Send
+		one_time_send = 0;
 
 		float angle = angle_reading.angle_val;
 
@@ -334,7 +337,7 @@ static void SendTxData(void)
 
 		// Transmit
 		LmHandlerErrorStatus_t status =
-		  LmHandlerSend(&AppData, LORAWAN_DEFAULT_CONFIRMED_MSG_STATE, &nextTxIn, false);
+		  LmHandlerSend(&AppData, LORAWAN_DEFAULT_CONFIRMED_MSG_STATE, &nextTxIn, true);
 
 		APP_LOG(TS_ON, VLEVEL_L, "LmHandlerSend status=%d\r\n", (int)status);
 
@@ -346,10 +349,12 @@ static void SendTxData(void)
 		else if (nextTxIn > 0)
 		{
 			APP_LOG(TS_ON, VLEVEL_L, "Next Tx in: ~%d second(s)\r\n", (int)(nextTxIn / 1000));
+			one_time_send = 1;
 		}
 		else
 		{
 			APP_LOG(TS_ON, VLEVEL_L, "SEND REQUEST FAILED\r\n");
+			one_time_send = 1;
 		}
   }
 }
@@ -415,6 +420,7 @@ static void OnJoinRequest(LmHandlerJoinParams_t *joinParams)
       {
         APP_LOG(TS_OFF, VLEVEL_M, "OTAA =====================\r\n");
       }
+
     }
     else
     {

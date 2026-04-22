@@ -66,6 +66,8 @@ ROTATION_DIRECTION rot_dir;
 int lower_bound_angle = 0;
 int upper_bound_angle = 90;
 
+int one_time_send = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -144,6 +146,7 @@ int main(void)
   //int angle = angle_reading.angle_val;
 
   /* USER CODE BEGIN WHILE */
+  one_time_send = 1;
   while (1)
   {
     /* USER CODE END WHILE */
@@ -394,8 +397,8 @@ void Read_Angle_Sensor(){
 
 	// Angle calculation - normalize ADC values as sensor readings are offset by VDD/2
     // This corresponds to ADC values being half of ADC max (2048) higher than we want
-	int sin = adc_values[0] - 2048;
-	int cos = adc_values[1] - 2048;
+	int cos = adc_values[0] - 2048;
+	int sin = adc_values[1] - 2048;
 
     // Convert to degrees and make positive
 	float angle = (atan2f(sin, cos) * 180/M_PI) + 180;
